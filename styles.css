@@ -241,14 +241,24 @@ main { padding: 12px 20px 40px; }
 .bchild { display: flex; align-items: center; flex: 1 1 0; position: relative; padding: 5px 0; }
 
 /* ---- conectores lado ESQUERDO (linhas apontando para a direita) ---- */
+/* haste horizontal de cada filho até a linha vertical (no centro do card filho) */
 .bchild::after {
   content: ""; position: absolute; top: 50%; right: calc(var(--bgap) / -2);
   width: calc(var(--bgap) / 2); height: 2px; background: var(--bline);
 }
-.bchildren::after {
-  content: ""; position: absolute; right: calc(var(--bgap) / -2); top: 25%; height: 50%;
+/* Linha vertical que liga os dois filhos, desenhada em DUAS metades (uma por
+   filho): do centro de cada filho até a fronteira entre eles, onde se encontram.
+   Assim a linha acompanha o centro REAL de cada filho mesmo quando um card é
+   mais alto que o outro (ex.: jogo decidido nos pênaltis ganha a linha de
+   "PÊNALTIS"). Antes era uma única linha fixa em 25%–75% da caixa, que só casava
+   com filhos de mesma altura — quando deixavam de ter, a linha "descolava" dos
+   conectores e o desalinhamento se propagava etapa a etapa até a final. */
+.bchild::before {
+  content: ""; position: absolute; right: calc(var(--bgap) / -2);
   width: 2px; background: var(--bline);
 }
+.bchild:first-child::before { top: 50%; bottom: 0; }   /* filho de cima: centro → base */
+.bchild:last-child::before  { top: 0; bottom: 50%; }   /* filho de baixo: topo → centro */
 .bcard.has-children::before {
   content: ""; position: absolute; left: calc(var(--bgap) / -2); top: 50%;
   width: calc(var(--bgap) / 2); height: 2px; background: var(--bline);
@@ -256,7 +266,7 @@ main { padding: 12px 20px 40px; }
 
 /* ---- conectores lado DIREITO (espelhados, apontando para a esquerda) ---- */
 .mirror .bchild::after { right: auto; left: calc(var(--bgap) / -2); }
-.mirror .bchildren::after { right: auto; left: calc(var(--bgap) / -2); }
+.mirror .bchild::before { right: auto; left: calc(var(--bgap) / -2); }
 .mirror .bcard.has-children::before { left: auto; right: calc(var(--bgap) / -2); }
 
 .bcard {
