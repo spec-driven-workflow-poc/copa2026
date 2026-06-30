@@ -618,12 +618,46 @@
     wrap.innerHTML = note + '<div id="bracket-display">' + bracketDisplayHtml() + '</div>';
   }
 
-  // os dois jogos que alimentam um jogo (via refs "W<num>")
+  // Para cada rodada do mata-mata, a rodada que a alimenta. (A "Disputa de 3º
+  // lugar" é renderizada à parte, fora da árvore, então não entra aqui.)
+  var FEEDER_ROUND = {
+    "Round of 16": "Round of 32",
+    "Quarter-final": "Round of 16",
+    "Semi-final": "Quarter-final",
+    "Final": "Semi-final"
+  };
+
+  // Acha, na rodada `round`, o jogo em que `country` jogou. Cada seleção disputa
+  // no máximo um jogo por rodada, então essa correspondência é única — e não
+  // depende do resultado (vale mesmo se o placar for editado pelo usuário).
+  function feederByTeam(round, country) {
+    for (var i = 0; i < STATE.matches.length; i++) {
+      var g = STATE.matches[i];
+      if (g.round !== round) continue;
+      var t1 = resolveRef(g.team1, "team1", g.num);
+      var t2 = resolveRef(g.team2, "team2", g.num);
+      if (t1.name === country || t2.name === country) return g;
+    }
+    return null;
+  }
+
+  // Os dois jogos que alimentam um jogo de mata-mata. Normalmente cada lado vem
+  // como "W<num>" (vencedor do jogo num). Mas a fonte (openfootball) SUBSTITUI
+  // esse placeholder pelo nome do país assim que o jogo-fonte termina (ex.: "W73"
+  // vira "Canada"). Nesse caso, recuperamos o jogo-fonte pelo país que avançou —
+  // senão a árvore "perderia" jogos já decididos (e os abaixo deles).
   function childMatches(m) {
+    var feederRound = FEEDER_ROUND[m.round];
+    if (!feederRound) return [];   // Round of 32 / grupos: é folha, sem jogos-fonte
     var kids = [];
     [m.team1, m.team2].forEach(function (ref) {
       var mm = String(ref).match(/^W(\d+)$/);
-      if (mm && STATE.byNum[parseInt(mm[1], 10)]) kids.push(STATE.byNum[parseInt(mm[1], 10)]);
+      if (mm && STATE.byNum[parseInt(mm[1], 10)]) {
+        kids.push(STATE.byNum[parseInt(mm[1], 10)]);
+      } else if (isCountry(ref)) {
+        var src = feederByTeam(feederRound, ref);
+        if (src) kids.push(src);
+      }
     });
     return kids;
   }
@@ -1143,7 +1177,8 @@
       toGmt3: toGmt3, fmtTime: fmtTime, fmtDayLabel: fmtDayLabel,
       computeStandings: computeStandings, computeThirdSlots: computeThirdSlots,
       resolveRef: resolveRef, matchOutcome: matchOutcome, annotateMatches: annotateMatches,
-      effectiveScore: effectiveScore, matchId: matchId, sortRows: sortRows
+      effectiveScore: effectiveScore, matchId: matchId, sortRows: sortRows,
+      childMatches: childMatches
     };
   }
 })();
