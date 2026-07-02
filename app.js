@@ -81,15 +81,21 @@
   /* --------------------------- placar efetivo --------------------------- */
   // Resultado considerado: override do usuário tem prioridade sobre a API.
 
+  // Placar final segundo a API. Na fonte (openfootball), `ft` é o placar dos
+  // 90 minutos; quando há prorrogação, o placar final vem em `et`.
+  function apiScore(m) {
+    if (!m.score) return null;
+    var ft = Array.isArray(m.score.et) ? m.score.et : m.score.ft;
+    if (!Array.isArray(ft)) return null;
+    return { ft: ft.slice(), p: m.score.p ? m.score.p.slice() : null };
+  }
+
   function effectiveScore(m) {
     var id = matchId(m);
     if (Object.prototype.hasOwnProperty.call(STATE.overrides, id)) {
       return STATE.overrides[id]; // pode ter ft:null (jogo "zerado" manualmente)
     }
-    if (m.score && Array.isArray(m.score.ft)) {
-      return { ft: m.score.ft.slice(), p: m.score.p ? m.score.p.slice() : null };
-    }
-    return null;
+    return apiScore(m);
   }
   function isEdited(m) {
     return Object.prototype.hasOwnProperty.call(STATE.overrides, matchId(m));
@@ -930,7 +936,7 @@
 
   // ao reverter, devolve os inputs ao valor que veio da API
   function resetRowInputs(id, m) {
-    var s = m.score;
+    var s = apiScore(m);
     function setVal(side, cls, val) {
       var el = document.querySelector('.' + cls + '[data-id="' + cssEsc(id) + '"][data-side="' + side + '"]');
       if (el) el.value = val;
