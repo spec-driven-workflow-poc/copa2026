@@ -1,0 +1,17 @@
+{
+  "name": "copa2026",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Acompanhamento da Copa do Mundo 2026 (HTML/CSS/JS puro).",
+  "scripts": {
+    "format:check": "prettier --check \"**/*.{js,css,html,json,md}\"",
+    "format:write": "prettier --write \"**/*.{js,css,html,json,md}\"",
+    "lint": "eslint .",
+    "test": "node --test --experimental-test-coverage --test-coverage-include='app.js' --test-coverage-lines=0.55 test/",
+    "check": "npm run format:check && npm run lint && npm run test"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.0"
+  }
+}

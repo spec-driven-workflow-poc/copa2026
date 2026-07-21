@@ -1,0 +1,8 @@
+openspec/
+docs/workflow/
+docs/superpowers/
+.claude/
+node_modules/
+package-lock.json
+.mcp.json
+countries.js
