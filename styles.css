@@ -1,4 +1,9 @@
 /* ====================== Copa do Mundo 2026 — estilos ====================== */
+/* FOLLOW-UP (ADR-0003): há cores hardcoded fora dos tokens do :root — gradiente
+   da topbar (#ffffff/#f4f7fb), fundo das abas (#e3e9f1), tooltip (#1f2a36),
+   fundos de input (#fff). Ao introduzir o tema escuro, extrair estes literais
+   para custom properties (tokens) para que o override de tema os alcance.
+   Acionar no change `dark-mode` (APR-02). Ver design.md de `establish-ui-shell`. */
 :root {
   --bg: #eef1f5;
   --card: #ffffff;
