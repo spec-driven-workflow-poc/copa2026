@@ -7,7 +7,7 @@
     "format:check": "prettier --check \"**/*.{js,css,html,json,md}\"",
     "format:write": "prettier --write \"**/*.{js,css,html,json,md}\"",
     "lint": "eslint .",
-    "test": "node --test --experimental-test-coverage --test-coverage-include='app.js' --test-coverage-lines=0.55 \"test/**/*.test.js\"",
+    "test": "node --test --experimental-test-coverage --test-coverage-include='app.js' --test-coverage-lines=20 \"test/**/*.test.js\"",
     "check": "npm run format:check && npm run lint && npm run test"
   },
   "devDependencies": {
