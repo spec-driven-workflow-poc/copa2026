@@ -120,6 +120,11 @@
       /* ignore */
     }
   }
+  // FOLLOW-UP (ADR-0002): quando uma 2ª preferência de usuário for persistida
+  // (ex.: tema), promover estas chaves soltas para um helper `prefs` namespaced
+  // — leitura/escrita centralizadas sob o prefixo wc2026_*_v1. Ver o design.md do
+  // change `persist-score-overrides`. Acionar quando este arquivo for tocado por
+  // uma feature que persista preferência nova.
   function setOverride(m, ft, p) {
     STATE.overrides[matchId(m)] = { ft: ft, p: p || null };
     saveOverrides();
