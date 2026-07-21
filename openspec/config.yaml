@@ -1,0 +1,22 @@
+schema: spec-driven
+
+# Mostrado à IA ao criar artefatos (proposal/specs/design/tasks).
+context: |
+  "Capability" do copa2026 (docs/capabilities/<cap>/: dados, classificacao,
+  apresentacao) NÃO é uma capability do OpenSpec. Os spec-ids em
+  openspec/specs/ são contratos por COMPORTAMENTO, kebab-case (ex.:
+  state-persistence, color-theme, standings-table): uma capability do
+  copa2026 acumula VÁRIOS spec-ids. Regra de nomenclatura: docs/glossary.md.
+
+rules:
+  proposal:
+    - >-
+      A seção Capabilities da proposal nomeia capabilities do OpenSpec, i.e.
+      spec-ids: liste contratos de comportamento kebab-case, nunca o nome de
+      uma capability do copa2026 (dados, classificacao, apresentacao). Reutilize
+      um openspec/specs/<spec-id>/ existente quando o comportamento dele muda;
+      crie um id novo para comportamento novo.
+  specs:
+    - >-
+      Uma pasta por spec-id de comportamento; nunca agrupe deltas sob o nome de
+      uma capability do copa2026.
