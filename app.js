@@ -15,25 +15,24 @@
 
   // Estado global
   var STATE = {
-    matches: [],        // jogos vindos da API (com id estável)
-    byNum: {},          // num -> jogo (mata-mata)
-    overrides: {},      // id -> { ft:[a,b]|null, p:[a,b]|null }
-    standings: {},      // "Group A" -> [linhas ordenadas]
-    thirdSlots: {},     // num do jogo R32 -> nome do país (melhor 3º atribuído)
+    matches: [], // jogos vindos da API (com id estável)
+    byNum: {}, // num -> jogo (mata-mata)
+    overrides: {}, // id -> { ft:[a,b]|null, p:[a,b]|null }
+    standings: {}, // "Group A" -> [linhas ordenadas]
+    thirdSlots: {}, // num do jogo R32 -> nome do país (melhor 3º atribuído)
     groupsComplete: false,
-    phase: "groups",    // "groups" | "knockout"
+    phase: "groups", // "groups" | "knockout"
     lastUpdated: null,
-    simNow: null        // data simulada (ms) p/ filtrar "próximos jogos" — só via ?date
+    simNow: null // data simulada (ms) p/ filtrar "próximos jogos" — só via ?date
   };
 
   var DOW = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-  var MONTHS = ["jan", "fev", "mar", "abr", "mai", "jun",
-                "jul", "ago", "set", "out", "nov", "dez"];
+  var MONTHS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
 
   /* ----------------------------- utilidades ----------------------------- */
 
   function getCountry(name) {
-    var c = (typeof COUNTRIES !== "undefined") ? COUNTRIES[name] : null;
+    var c = typeof COUNTRIES !== "undefined" ? COUNTRIES[name] : null;
     return c || null;
   }
 
@@ -117,7 +116,9 @@
   function saveOverrides() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE.overrides));
-    } catch (e) { /* ignore */ }
+    } catch (e) {
+      /* ignore */
+    }
   }
   function setOverride(m, ft, p) {
     STATE.overrides[matchId(m)] = { ft: ft, p: p || null };
@@ -132,7 +133,15 @@
 
   function emptyRow(team) {
     return {
-      team: team, J: 0, V: 0, E: 0, D: 0, GP: 0, GC: 0, SG: 0, PTS: 0
+      team: team,
+      J: 0,
+      V: 0,
+      E: 0,
+      D: 0,
+      GP: 0,
+      GC: 0,
+      SG: 0,
+      PTS: 0
     };
   }
 
@@ -142,24 +151,45 @@
     STATE.matches.forEach(function (m) {
       if (!m.group) return;
       if (!groups[m.group]) groups[m.group] = {};
-      if (isCountry(m.team1) && !groups[m.group][m.team1]) groups[m.group][m.team1] = emptyRow(m.team1);
-      if (isCountry(m.team2) && !groups[m.group][m.team2]) groups[m.group][m.team2] = emptyRow(m.team2);
+      if (isCountry(m.team1) && !groups[m.group][m.team1])
+        groups[m.group][m.team1] = emptyRow(m.team1);
+      if (isCountry(m.team2) && !groups[m.group][m.team2])
+        groups[m.group][m.team2] = emptyRow(m.team2);
     });
 
     var allGroupDone = true;
     STATE.matches.forEach(function (m) {
       if (!m.group) return;
       var s = effectiveScore(m);
-      if (!s || !s.ft || s.ft[0] == null || s.ft[1] == null) { allGroupDone = false; return; }
-      var a = groups[m.group][m.team1], b = groups[m.group][m.team2];
+      if (!s || !s.ft || s.ft[0] == null || s.ft[1] == null) {
+        allGroupDone = false;
+        return;
+      }
+      var a = groups[m.group][m.team1],
+        b = groups[m.group][m.team2];
       if (!a || !b) return;
-      var g1 = s.ft[0], g2 = s.ft[1];
-      a.J++; b.J++;
-      a.GP += g1; a.GC += g2;
-      b.GP += g2; b.GC += g1;
-      if (g1 > g2) { a.V++; b.D++; a.PTS += 3; }
-      else if (g1 < g2) { b.V++; a.D++; b.PTS += 3; }
-      else { a.E++; b.E++; a.PTS += 1; b.PTS += 1; }
+      var g1 = s.ft[0],
+        g2 = s.ft[1];
+      a.J++;
+      b.J++;
+      a.GP += g1;
+      a.GC += g2;
+      b.GP += g2;
+      b.GC += g1;
+      if (g1 > g2) {
+        a.V++;
+        b.D++;
+        a.PTS += 3;
+      } else if (g1 < g2) {
+        b.V++;
+        a.D++;
+        b.PTS += 3;
+      } else {
+        a.E++;
+        b.E++;
+        a.PTS += 1;
+        b.PTS += 1;
+      }
     });
 
     var out = {};
@@ -173,7 +203,11 @@
       out[g] = rows;
     });
     STATE.standings = out;
-    STATE.groupsComplete = allGroupDone && STATE.matches.some(function (m) { return m.group; });
+    STATE.groupsComplete =
+      allGroupDone &&
+      STATE.matches.some(function (m) {
+        return m.group;
+      });
   }
 
   // Critérios: pontos, saldo, gols pró, ordem alfabética (PT) como desempate final.
@@ -193,12 +227,21 @@
   // Assim que isso acontece, o 1º e o 2º daquele grupo já podem ser exibidos
   // nos placeholders do mata-mata — independentemente dos outros grupos.
   function groupComplete(g) {
-    var ms = STATE.matches.filter(function (m) { return m.group === g; });
-    return ms.length > 0 && ms.every(function (m) { return hasResult(m); });
+    var ms = STATE.matches.filter(function (m) {
+      return m.group === g;
+    });
+    return (
+      ms.length > 0 &&
+      ms.every(function (m) {
+        return hasResult(m);
+      })
+    );
   }
 
   // Pontuação máxima que uma linha ainda pode alcançar (3 jogos por grupo).
-  function maxFuturePts(r) { return r.PTS + 3 * Math.max(0, 3 - r.J); }
+  function maxFuturePts(r) {
+    return r.PTS + 3 * Math.max(0, 3 - r.J);
+  }
 
   // Quantos 3ºs colocados de OUTROS grupos esta linha já supera (pelos mesmos
   // critérios de desempate). Como 8 dos 12 terceiros avançam, superar >= 4
@@ -224,14 +267,14 @@
     var complete = groupComplete(g);
 
     // verde — classificado
-    if (r.V >= 2) return "green";                 // 2 vitórias num grupo de 4 garantem top-2
+    if (r.V >= 2) return "green"; // 2 vitórias num grupo de 4 garantem top-2
     if (complete && i <= 1) return "green";
     if (i <= 1) {
       var canReach = 0;
       rows.forEach(function (u, j) {
         if (j !== i && maxFuturePts(u) >= r.PTS) canReach++;
       });
-      if (canReach <= 1) return "green";          // no máx. 1 time pode alcançá-la → top-2
+      if (canReach <= 1) return "green"; // no máx. 1 time pode alcançá-la → top-2
     }
 
     // amarelo — 3º que avança (antes do vermelho: 3º nunca é vermelho)
@@ -243,7 +286,7 @@
     rows.forEach(function (u, j) {
       if (j !== i && u.PTS > maxFuturePts(r)) guaranteedAbove++;
     });
-    if (guaranteedAbove >= 3) return "red";       // 3 times garantidamente acima → último
+    if (guaranteedAbove >= 3) return "red"; // 3 times garantidamente acima → último
 
     return "";
   }
@@ -265,25 +308,39 @@
       }
     });
     // ranqueia terceiros pelos mesmos critérios e pega os 8 melhores
-    thirds.sort(function (x, y) { return sortRows(x.row, y.row); });
+    thirds.sort(function (x, y) {
+      return sortRows(x.row, y.row);
+    });
     var qualified = thirds.slice(0, 8);
     var qualSet = {};
-    qualified.forEach(function (t) { qualSet[t.group] = t; });
+    qualified.forEach(function (t) {
+      qualSet[t.group] = t;
+    });
 
     // slots R32 que recebem um terceiro: team1 ou team2 no formato "3A/B/..."
     var slots = [];
     STATE.matches.forEach(function (m) {
       if (m.num == null) return;
-      [["team1", m.team1], ["team2", m.team2]].forEach(function (pair) {
+      [
+        ["team1", m.team1],
+        ["team2", m.team2]
+      ].forEach(function (pair) {
         if (/^3[A-L](\/[A-L])*$/.test(pair[1])) {
-          var allowed = pair[1].slice(1).split("/").filter(function (gp) { return qualSet[gp]; });
+          var allowed = pair[1]
+            .slice(1)
+            .split("/")
+            .filter(function (gp) {
+              return qualSet[gp];
+            });
           slots.push({ num: m.num, side: pair[0], code: pair[1], allowed: allowed });
         }
       });
     });
 
     // emparelhamento (backtracking) slot -> grupo terceiro qualificado
-    var groupsAvail = qualified.map(function (t) { return t.group; });
+    var groupsAvail = qualified.map(function (t) {
+      return t.group;
+    });
     var assignment = {};
     function backtrack(i) {
       if (i >= slots.length) return true;
@@ -352,7 +409,7 @@
       if (src) {
         var res = matchOutcome(src);
         if (res) {
-          var pick = (m[1] === "W") ? res.winner : res.loser;
+          var pick = m[1] === "W" ? res.winner : res.loser;
           if (pick) return { name: pick, label: ptName(pick), decided: true };
         }
       }
@@ -373,11 +430,20 @@
     var t2 = resolveRef(m.team2, "team2", m.num);
     if (!t1.decided || !t2.decided) return null;
     var w, l;
-    if (s.ft[0] > s.ft[1]) { w = t1.name; l = t2.name; }
-    else if (s.ft[0] < s.ft[1]) { w = t2.name; l = t1.name; }
-    else if (s.p && s.p[0] != null && s.p[1] != null && s.p[0] !== s.p[1]) {
-      if (s.p[0] > s.p[1]) { w = t1.name; l = t2.name; }
-      else { w = t2.name; l = t1.name; }
+    if (s.ft[0] > s.ft[1]) {
+      w = t1.name;
+      l = t2.name;
+    } else if (s.ft[0] < s.ft[1]) {
+      w = t2.name;
+      l = t1.name;
+    } else if (s.p && s.p[0] != null && s.p[1] != null && s.p[0] !== s.p[1]) {
+      if (s.p[0] > s.p[1]) {
+        w = t1.name;
+        l = t2.name;
+      } else {
+        w = t2.name;
+        l = t1.name;
+      }
     } else {
       return null; // empate sem pênaltis definidos
     }
@@ -391,13 +457,23 @@
     var cls = "flag" + (size === "lg" ? " flag-lg" : "");
     if (!c) return '<span class="flag flag-ph" title="A definir"></span>';
     var w = size === "lg" ? "w40" : "w20";
-    return '<img class="' + cls + '" loading="lazy" alt="" ' +
-      'src="https://flagcdn.com/' + w + '/' + c.iso + '.png" ' +
-      'onerror="this.classList.add(\'flag-ph\');this.removeAttribute(\'src\')">';
+    return (
+      '<img class="' +
+      cls +
+      '" loading="lazy" alt="" ' +
+      'src="https://flagcdn.com/' +
+      w +
+      "/" +
+      c.iso +
+      '.png" ' +
+      "onerror=\"this.classList.add('flag-ph');this.removeAttribute('src')\">"
+    );
   }
 
   // escapa aspas duplas para uso seguro em atributos HTML
-  function attrEsc(s) { return String(s).replace(/"/g, "&quot;"); }
+  function attrEsc(s) {
+    return String(s).replace(/"/g, "&quot;");
+  }
 
   function teamChip(ref, side, matchNum, big) {
     var r = resolveRef(ref, side, matchNum);
@@ -405,21 +481,37 @@
     // title = nome completo: aparece no hover quando o texto é cortado por "…"
     var t = ' title="' + attrEsc(r.label) + '"';
     var nameHtml = r.decided
-      ? flagImg(r.name, size) + '<span class="tname"' + t + '>' + r.label + '</span>'
-      : '<span class="flag flag-ph"></span><span class="tname tname-ph"' + t + '>' + r.label + '</span>';
-    if (r.estimated) nameHtml += ' <span class="est" title="Atribuição estimada do melhor 3º colocado — a tabela oficial da FIFA pode diferir.">≈</span>';
-    return '<span class="team">' + nameHtml + '</span>';
+      ? flagImg(r.name, size) + '<span class="tname"' + t + ">" + r.label + "</span>"
+      : '<span class="flag flag-ph"></span><span class="tname tname-ph"' +
+        t +
+        ">" +
+        r.label +
+        "</span>";
+    if (r.estimated)
+      nameHtml +=
+        ' <span class="est" title="Atribuição estimada do melhor 3º colocado — a tabela oficial da FIFA pode diferir.">≈</span>';
+    return '<span class="team">' + nameHtml + "</span>";
   }
 
   // ------- próximos jogos -------
   function renderUpcoming() {
     var list = STATE.matches
-      .filter(function (m) { return !hasResult(m); })
-      .map(function (m) { return { m: m, dt: toGmt3(m.date, m.time) }; })
-      .filter(function (x) { return x.dt; })
+      .filter(function (m) {
+        return !hasResult(m);
+      })
+      .map(function (m) {
+        return { m: m, dt: toGmt3(m.date, m.time) };
+      })
+      .filter(function (x) {
+        return x.dt;
+      })
       // ?date simula "hoje": esconde jogos anteriores à data simulada
-      .filter(function (x) { return STATE.simNow == null || x.dt.getTime() >= STATE.simNow; })
-      .sort(function (a, b) { return a.dt - b.dt; })
+      .filter(function (x) {
+        return STATE.simNow == null || x.dt.getTime() >= STATE.simNow;
+      })
+      .sort(function (a, b) {
+        return a.dt - b.dt;
+      })
       .slice(0, 8);
 
     var el = document.getElementById("upcoming-list");
@@ -427,20 +519,30 @@
       el.innerHTML = '<p class="empty">Sem jogos pendentes. 🏆</p>';
       return;
     }
-    el.innerHTML = list.map(function (x) {
-      var m = x.m;
-      var stageLabel = m.group ? m.group.replace("Group ", "Grupo ") : roundPt(m.round);
-      return '<div class="up-card">' +
-        '<div class="up-when"><span class="up-day">' + fmtDayLabel(x.dt) + '</span>' +
-        '<span class="up-time">' + fmtTime(x.dt) + '</span></div>' +
-        '<div class="up-teams">' +
+    el.innerHTML = list
+      .map(function (x) {
+        var m = x.m;
+        var stageLabel = m.group ? m.group.replace("Group ", "Grupo ") : roundPt(m.round);
+        return (
+          '<div class="up-card">' +
+          '<div class="up-when"><span class="up-day">' +
+          fmtDayLabel(x.dt) +
+          "</span>" +
+          '<span class="up-time">' +
+          fmtTime(x.dt) +
+          "</span></div>" +
+          '<div class="up-teams">' +
           teamChip(m.team1, "team1", m.num) +
           '<span class="up-vs">×</span>' +
           teamChip(m.team2, "team2", m.num) +
-        '</div>' +
-        '<div class="up-stage">' + stageLabel + '</div>' +
-      '</div>';
-    }).join("");
+          "</div>" +
+          '<div class="up-stage">' +
+          stageLabel +
+          "</div>" +
+          "</div>"
+        );
+      })
+      .join("");
   }
 
   function roundPt(round) {
@@ -452,7 +554,7 @@
       "Quarter-final": "Quartas de final",
       "Semi-final": "Semifinal",
       "Match for third place": "Disputa de 3º lugar",
-      "Final": "Final"
+      Final: "Final"
     };
     return map[round] || round;
   }
@@ -464,25 +566,42 @@
   function renderGroups() {
     var wrap = document.getElementById("groups");
     var groupNames = Object.keys(STATE.standings).sort();
-    if (!groupNames.length) { wrap.innerHTML = '<p class="empty">Carregando grupos…</p>'; return; }
+    if (!groupNames.length) {
+      wrap.innerHTML = '<p class="empty">Carregando grupos…</p>';
+      return;
+    }
 
     var open = wrap.classList.contains("games-open");
-    var cards = groupNames.map(function (g) {
-      var letter = g.replace("Group ", "");
-      return '<div class="group-card">' +
-        '<h3 class="group-title">Grupo ' + letter + '</h3>' +
-        '<div class="standings-slot" data-grp="' + g + '">' + standingsTable(g) + '</div>' +
-        renderGroupMatches(g) +
-      '</div>';
-    }).join("");
+    var cards = groupNames
+      .map(function (g) {
+        var letter = g.replace("Group ", "");
+        return (
+          '<div class="group-card">' +
+          '<h3 class="group-title">Grupo ' +
+          letter +
+          "</h3>" +
+          '<div class="standings-slot" data-grp="' +
+          g +
+          '">' +
+          standingsTable(g) +
+          "</div>" +
+          renderGroupMatches(g) +
+          "</div>"
+        );
+      })
+      .join("");
 
     wrap.innerHTML =
       '<div class="groups-toolbar">' +
-        '<button id="toggle-games" class="toggle-games" type="button" aria-pressed="' + open + '">' +
-          (open ? "▴ Ocultar jogos" : "▾ Ver jogos") +
-        '</button>' +
-      '</div>' +
-      '<div class="groups-grid">' + cards + '</div>';
+      '<button id="toggle-games" class="toggle-games" type="button" aria-pressed="' +
+      open +
+      '">' +
+      (open ? "▴ Ocultar jogos" : "▾ Ver jogos") +
+      "</button>" +
+      "</div>" +
+      '<div class="groups-grid">' +
+      cards +
+      "</div>";
 
     sizeGroupGrid();
   }
@@ -523,30 +642,70 @@
 
   function standingsTable(g) {
     var rows = STATE.standings[g] || [];
-    var body = rows.map(function (r, i) {
-      var st = confirmStatus(g, rows, i);
-      var titles = { green: "Classificado", yellow: "3º colocado — pode avançar", red: "Eliminado" };
-      var trClass = st ? "conf conf-" + st : "";
-      var trTitle = st ? ' title="' + titles[st] + '"' : "";
-      return '<tr class="' + trClass + '"' + trTitle + '>' +
-        '<td class="pos">' + (i + 1) + '</td>' +
-        '<td class="team-cell">' + flagImg(r.team) + '<span class="tname" title="' + attrEsc(ptName(r.team)) + '">' + ptName(r.team) + '</span></td>' +
-        '<td class="b">' + r.PTS + '</td>' +
-        '<td>' + r.J + '</td><td>' + r.V + '</td><td>' + r.E + '</td><td>' + r.D + '</td>' +
-        '<td>' + r.GP + '</td><td>' + r.GC + '</td><td>' + sg(r.SG) + '</td>' +
-      '</tr>';
-    }).join("");
-    return '<table class="standings"><thead><tr>' +
-        '<th class="pos">#</th><th class="team-h">Seleção</th>' +
-        th("PTS", "Pontos: vitória vale 3, empate 1, derrota 0.") +
-        th("J", "Jogos disputados.") +
-        th("V", "Vitórias.") +
-        th("E", "Empates.") +
-        th("D", "Derrotas.") +
-        th("GP", "Gols pró (marcados).", "left") +
-        th("GC", "Gols contra (sofridos).", "left") +
-        th("SG", "Saldo de gols (GP − GC).", "left") +
-      '</tr></thead><tbody>' + body + '</tbody></table>';
+    var body = rows
+      .map(function (r, i) {
+        var st = confirmStatus(g, rows, i);
+        var titles = {
+          green: "Classificado",
+          yellow: "3º colocado — pode avançar",
+          red: "Eliminado"
+        };
+        var trClass = st ? "conf conf-" + st : "";
+        var trTitle = st ? ' title="' + titles[st] + '"' : "";
+        return (
+          '<tr class="' +
+          trClass +
+          '"' +
+          trTitle +
+          ">" +
+          '<td class="pos">' +
+          (i + 1) +
+          "</td>" +
+          '<td class="team-cell">' +
+          flagImg(r.team) +
+          '<span class="tname" title="' +
+          attrEsc(ptName(r.team)) +
+          '">' +
+          ptName(r.team) +
+          "</span></td>" +
+          '<td class="b">' +
+          r.PTS +
+          "</td>" +
+          "<td>" +
+          r.J +
+          "</td><td>" +
+          r.V +
+          "</td><td>" +
+          r.E +
+          "</td><td>" +
+          r.D +
+          "</td>" +
+          "<td>" +
+          r.GP +
+          "</td><td>" +
+          r.GC +
+          "</td><td>" +
+          sg(r.SG) +
+          "</td>" +
+          "</tr>"
+        );
+      })
+      .join("");
+    return (
+      '<table class="standings"><thead><tr>' +
+      '<th class="pos">#</th><th class="team-h">Seleção</th>' +
+      th("PTS", "Pontos: vitória vale 3, empate 1, derrota 0.") +
+      th("J", "Jogos disputados.") +
+      th("V", "Vitórias.") +
+      th("E", "Empates.") +
+      th("D", "Derrotas.") +
+      th("GP", "Gols pró (marcados).", "left") +
+      th("GC", "Gols contra (sofridos).", "left") +
+      th("SG", "Saldo de gols (GP − GC).", "left") +
+      "</tr></thead><tbody>" +
+      body +
+      "</tbody></table>"
+    );
   }
 
   // re-renderiza apenas as tabelas de classificação (sem tocar nos inputs)
@@ -557,22 +716,41 @@
     });
   }
 
-  function sg(v) { return (v > 0 ? "+" : "") + v; }
+  function sg(v) {
+    return (v > 0 ? "+" : "") + v;
+  }
 
   // cabeçalho com ícone de informação (tooltip no hover)
   // side="left" faz o tooltip abrir para a esquerda (colunas próximas da borda direita)
   function th(abbr, desc, side) {
     var cls = "info" + (side === "left" ? " tip-left" : "");
-    return '<th class="info-h"><span class="abbr">' + abbr +
-      '</span><span class="' + cls + '" tabindex="0" aria-label="' + desc +
-      '">ⓘ<span class="tip">' + desc + '</span></span></th>';
+    return (
+      '<th class="info-h"><span class="abbr">' +
+      abbr +
+      '</span><span class="' +
+      cls +
+      '" tabindex="0" aria-label="' +
+      desc +
+      '">ⓘ<span class="tip">' +
+      desc +
+      "</span></span></th>"
+    );
   }
 
   function renderGroupMatches(g) {
-    var ms = STATE.matches.filter(function (m) { return m.group === g; })
-      .sort(function (a, b) { return (toGmt3(a.date, a.time) || 0) - (toGmt3(b.date, b.time) || 0); });
-    var rows = ms.map(function (m) { return matchEditRow(m); }).join("");
-    return '<div class="group-games"><div class="games-list">' + rows + '</div></div>';
+    var ms = STATE.matches
+      .filter(function (m) {
+        return m.group === g;
+      })
+      .sort(function (a, b) {
+        return (toGmt3(a.date, a.time) || 0) - (toGmt3(b.date, b.time) || 0);
+      });
+    var rows = ms
+      .map(function (m) {
+        return matchEditRow(m);
+      })
+      .join("");
+    return '<div class="group-games"><div class="games-list">' + rows + "</div></div>";
   }
 
   // linha editável de um jogo (fase de grupos). Layout empilhado: cada time em
@@ -585,26 +763,48 @@
     var v1 = s && s.ft && s.ft[0] != null ? s.ft[0] : "";
     var v2 = s && s.ft && s.ft[1] != null ? s.ft[1] : "";
     var id = matchId(m);
-    return '<div class="game' + (edited ? " edited" : "") + '" data-id="' + id + '">' +
-      '<div class="game-when">' + (dt ? fmtDayLabel(dt) + ' · ' + fmtTime(dt) : '') + '</div>' +
+    return (
+      '<div class="game' +
+      (edited ? " edited" : "") +
+      '" data-id="' +
+      id +
+      '">' +
+      '<div class="game-when">' +
+      (dt ? fmtDayLabel(dt) + " · " + fmtTime(dt) : "") +
+      "</div>" +
       gameSide(id, "s1", v1, m.team1, "team1", m.num) +
       gameSide(id, "s2", v2, m.team2, "team2", m.num) +
-      '<div class="game-foot">' + footerHtml(id, edited) + '</div>' +
-    '</div>';
+      '<div class="game-foot">' +
+      footerHtml(id, edited) +
+      "</div>" +
+      "</div>"
+    );
   }
 
   // uma linha "placar + seleção" de um jogo de grupo
   function gameSide(id, side, val, ref, refSide, num) {
-    return '<div class="game-side">' +
-      '<input class="score-in" data-id="' + id + '" data-side="' + side + '" type="number" min="0" inputmode="numeric" value="' + val + '">' +
-      '<span class="g-team">' + teamChip(ref, refSide, num) + '</span>' +
-    '</div>';
+    return (
+      '<div class="game-side">' +
+      '<input class="score-in" data-id="' +
+      id +
+      '" data-side="' +
+      side +
+      '" type="number" min="0" inputmode="numeric" value="' +
+      val +
+      '">' +
+      '<span class="g-team">' +
+      teamChip(ref, refSide, num) +
+      "</span>" +
+      "</div>"
+    );
   }
 
   // rodapé do jogo: badge "automático/editado" + botão de reverter
   function footerHtml(id, edited) {
     return edited
-      ? '<span class="edited-badge">editado</span><button class="revert" data-id="' + id + '" type="button">↺ reverter p/ API</button>'
+      ? '<span class="edited-badge">editado</span><button class="revert" data-id="' +
+          id +
+          '" type="button">↺ reverter p/ API</button>'
       : '<span class="auto-badge">automático (API)</span>';
   }
 
@@ -616,12 +816,17 @@
   // são atualizados, para nunca perder o foco do que está sendo digitado.
   function renderKnockout() {
     var wrap = document.getElementById("knockout");
-    var finalMatch = STATE.matches.filter(function (m) { return m.round === "Final"; })[0];
-    if (!finalMatch) { wrap.innerHTML = '<p class="empty">Chaveamento indisponível.</p>'; return; }
+    var finalMatch = STATE.matches.filter(function (m) {
+      return m.round === "Final";
+    })[0];
+    if (!finalMatch) {
+      wrap.innerHTML = '<p class="empty">Chaveamento indisponível.</p>';
+      return;
+    }
     var note = STATE.groupsComplete
       ? ""
       : '<p class="ko-note">A fase de grupos ainda não terminou — as seleções aparecem conforme os resultados são confirmados. Você pode editar qualquer placar direto nos cards.</p>';
-    wrap.innerHTML = note + '<div id="bracket-display">' + bracketDisplayHtml() + '</div>';
+    wrap.innerHTML = note + '<div id="bracket-display">' + bracketDisplayHtml() + "</div>";
   }
 
   // Para cada rodada do mata-mata, a rodada que a alimenta. (A "Disputa de 3º
@@ -630,7 +835,7 @@
     "Round of 16": "Round of 32",
     "Quarter-final": "Round of 16",
     "Semi-final": "Quarter-final",
-    "Final": "Semi-final"
+    Final: "Semi-final"
   };
 
   // Acha, na rodada `round`, o jogo em que `country` jogou. Cada seleção disputa
@@ -654,7 +859,7 @@
   // senão a árvore "perderia" jogos já decididos (e os abaixo deles).
   function childMatches(m) {
     var feederRound = FEEDER_ROUND[m.round];
-    if (!feederRound) return [];   // Round of 32 / grupos: é folha, sem jogos-fonte
+    if (!feederRound) return []; // Round of 32 / grupos: é folha, sem jogos-fonte
     var kids = [];
     [m.team1, m.team2].forEach(function (ref) {
       var mm = String(ref).match(/^W(\d+)$/);
@@ -669,27 +874,39 @@
   }
 
   function bracketDisplayHtml() {
-    var finalMatch = STATE.matches.filter(function (m) { return m.round === "Final"; })[0];
-    var third = STATE.matches.filter(function (m) { return m.round === "Match for third place"; })[0];
+    var finalMatch = STATE.matches.filter(function (m) {
+      return m.round === "Final";
+    })[0];
+    var third = STATE.matches.filter(function (m) {
+      return m.round === "Match for third place";
+    })[0];
     if (!finalMatch) return "";
-    var semis = childMatches(finalMatch);   // [semi esquerda, semi direita]
+    var semis = childMatches(finalMatch); // [semi esquerda, semi direita]
     var leftHtml = semis[0] ? renderNode(semis[0], "left") : "";
     var rightHtml = semis[1] ? renderNode(semis[1], "right") : "";
     // .bracket-inner tem a largura do conteúdo (rola junto com ele); a barra de
     // cabeçalhos de etapa é posicionada por JS (layoutBracket) sobre cada coluna.
     var bracket =
       '<div class="bracket-scroll"><div class="bracket-inner">' +
-        '<div class="bracket-headers"></div>' +
-        '<div class="bracket2">' +
-          '<div class="bside left">' + leftHtml + '</div>' +
-          '<div class="bcenter">' + bracketCard(finalMatch, false) + '</div>' +
-          '<div class="bside right">' + rightHtml + '</div>' +
-        '</div>' +
-      '</div></div>';
+      '<div class="bracket-headers"></div>' +
+      '<div class="bracket2">' +
+      '<div class="bside left">' +
+      leftHtml +
+      "</div>" +
+      '<div class="bcenter">' +
+      bracketCard(finalMatch, false) +
+      "</div>" +
+      '<div class="bside right">' +
+      rightHtml +
+      "</div>" +
+      "</div>" +
+      "</div></div>";
     // 3º lugar fica abaixo do chaveamento (fora do centro), para que a final
     // permaneça alinhada verticalmente com as semifinais.
     var thirdHtml = third
-      ? '<div class="third-place"><h3>Disputa de 3º lugar</h3>' + bracketCard(third, false) + '</div>'
+      ? '<div class="third-place"><h3>Disputa de 3º lugar</h3>' +
+        bracketCard(third, false) +
+        "</div>"
       : "";
     return bracket + thirdHtml;
   }
@@ -706,7 +923,10 @@
   // medimos a largura natural do chaveamento e, se sobra espaço, alargamos os
   // cards (--bcard-w) para preenchê-lo; se não couber, mantém o tamanho base e a
   // própria área rola lateralmente.
-  var BCARD_BASE = 122, BCARD_MIN = 122, BCARD_MAX = 200, BCARD_COLS = 9;
+  var BCARD_BASE = 122,
+    BCARD_MIN = 122,
+    BCARD_MAX = 200,
+    BCARD_COLS = 9;
 
   function sizeBracket() {
     var scroll = document.querySelector(".bracket-scroll");
@@ -745,7 +965,10 @@
       var center = r.left - innerLeft + r.width / 2;
       var col = null;
       for (var i = 0; i < cols.length; i++) {
-        if (Math.abs(cols[i].center - center) < 10) { col = cols[i]; break; }
+        if (Math.abs(cols[i].center - center) < 10) {
+          col = cols[i];
+          break;
+        }
       }
       if (!col) cols.push({ center: center, round: m.round });
     });
@@ -772,15 +995,23 @@
     var kids = childMatches(m);
     var mir = dir === "right" ? " mirror" : "";
     if (kids.length === 2) {
-      return '<div class="bnode' + mir + '">' +
+      return (
+        '<div class="bnode' +
+        mir +
+        '">' +
         '<div class="bchildren">' +
-          '<div class="bchild">' + renderNode(kids[0], dir) + '</div>' +
-          '<div class="bchild">' + renderNode(kids[1], dir) + '</div>' +
-        '</div>' +
+        '<div class="bchild">' +
+        renderNode(kids[0], dir) +
+        "</div>" +
+        '<div class="bchild">' +
+        renderNode(kids[1], dir) +
+        "</div>" +
+        "</div>" +
         bracketCard(m, true) +
-      '</div>';
+        "</div>"
+      );
     }
-    return '<div class="bnode leaf' + mir + '">' + bracketCard(m, false) + '</div>';
+    return '<div class="bnode leaf' + mir + '">' + bracketCard(m, false) + "</div>";
   }
 
   // empate no tempo normal: ambos os placares preenchidos e iguais
@@ -792,7 +1023,7 @@
   // bandeira do time de um lado, ao lado do input de pênalti (sinaliza o lado)
   function penFlag(m, refSide) {
     var r = resolveRef(m[refSide], refSide, m.num);
-    return '<span class="pen-flag" title="' + attrEsc(r.label) + '">' + flagImg(r.name) + '</span>';
+    return '<span class="pen-flag" title="' + attrEsc(r.label) + '">' + flagImg(r.name) + "</span>";
   }
 
   // bloco de pênaltis: título "pênaltis" em cima, inputs centralizados, cada um
@@ -801,14 +1032,24 @@
     var s = effectiveScore(m);
     var p1 = s && s.p && s.p[0] != null ? s.p[0] : "";
     var p2 = s && s.p && s.p[1] != null ? s.p[1] : "";
-    return '<div class="pen-title">pênaltis</div>' +
+    return (
+      '<div class="pen-title">pênaltis</div>' +
       '<div class="pen-row">' +
-        penFlag(m, "team1") +
-        '<input class="pen-in" data-id="' + id + '" data-side="p1" type="number" min="0" inputmode="numeric" value="' + p1 + '">' +
-        '<span class="dash">-</span>' +
-        '<input class="pen-in" data-id="' + id + '" data-side="p2" type="number" min="0" inputmode="numeric" value="' + p2 + '">' +
-        penFlag(m, "team2") +
-      '</div>';
+      penFlag(m, "team1") +
+      '<input class="pen-in" data-id="' +
+      id +
+      '" data-side="p1" type="number" min="0" inputmode="numeric" value="' +
+      p1 +
+      '">' +
+      '<span class="dash">-</span>' +
+      '<input class="pen-in" data-id="' +
+      id +
+      '" data-side="p2" type="number" min="0" inputmode="numeric" value="' +
+      p2 +
+      '">' +
+      penFlag(m, "team2") +
+      "</div>"
+    );
   }
 
   // card EDITÁVEL do chaveamento: placar à frente do nome; pênaltis só em empate.
@@ -821,35 +1062,67 @@
     var v2 = s && s.ft && s.ft[1] != null ? s.ft[1] : "";
     var isFinal = m.round === "Final";
     var isThird = m.round === "Match for third place";
-    var cls = "bcard" + (hasChildren ? " has-children" : "") +
-              (isFinal ? " is-final" : "") + (isThird ? " is-third" : "") +
-              (edited ? " edited" : "");
+    var cls =
+      "bcard" +
+      (hasChildren ? " has-children" : "") +
+      (isFinal ? " is-final" : "") +
+      (isThird ? " is-third" : "") +
+      (edited ? " edited" : "");
     // O nome da etapa agora vive no topo da coluna (layoutBracket), não no card.
     // O card mostra apenas a data; a final mantém um 🏆 discreto como destaque.
-    var when = dt ? '<span class="bcard-when">' + fmtDayLabel(dt) + ' ' + fmtTime(dt) + '</span>' : '';
-    var head = (isFinal ? '🏆 ' : '') + (when || (isFinal ? 'Final' : ''));
-    return '<div class="' + cls + '" data-id="' + id + '">' +
-      '<div class="bcard-head">' + head +
-        '<span class="bcard-badge">' + bcardBadge(id, edited) + '</span></div>' +
+    var when = dt
+      ? '<span class="bcard-when">' + fmtDayLabel(dt) + " " + fmtTime(dt) + "</span>"
+      : "";
+    var head = (isFinal ? "🏆 " : "") + (when || (isFinal ? "Final" : ""));
+    return (
+      '<div class="' +
+      cls +
+      '" data-id="' +
+      id +
+      '">' +
+      '<div class="bcard-head">' +
+      head +
+      '<span class="bcard-badge">' +
+      bcardBadge(id, edited) +
+      "</span></div>" +
       bcardRow(m, "team1", "s1", id, v1) +
       bcardRow(m, "team2", "s2", id, v2) +
-      '<div class="bcard-pens-slot">' + (isTie(m) ? penaltiesHtml(m, id) : '') + '</div>' +
-    '</div>';
+      '<div class="bcard-pens-slot">' +
+      (isTie(m) ? penaltiesHtml(m, id) : "") +
+      "</div>" +
+      "</div>"
+    );
   }
 
   // uma linha do card de mata-mata: [placar editável] [bandeira + nome]
   function bcardRow(m, refSide, scoreSide, id, val) {
     var win = isWinnerSide(m, refSide) ? " win" : "";
-    return '<div class="bcard-row' + win + '" data-team="' + refSide + '">' +
-      '<input class="score-in bscore-in" data-id="' + id + '" data-side="' + scoreSide + '" type="number" min="0" inputmode="numeric" value="' + val + '">' +
-      '<span class="bteam">' + teamChip(m[refSide], refSide, m.num) + '</span>' +
-    '</div>';
+    return (
+      '<div class="bcard-row' +
+      win +
+      '" data-team="' +
+      refSide +
+      '">' +
+      '<input class="score-in bscore-in" data-id="' +
+      id +
+      '" data-side="' +
+      scoreSide +
+      '" type="number" min="0" inputmode="numeric" value="' +
+      val +
+      '">' +
+      '<span class="bteam">' +
+      teamChip(m[refSide], refSide, m.num) +
+      "</span>" +
+      "</div>"
+    );
   }
 
   function bcardBadge(id, edited) {
     return edited
       ? '<span class="edited-badge sm">editado</span>' +
-        '<button class="revert mini" data-id="' + id + '" type="button" title="Reverter para o resultado da API">↺</button>'
+          '<button class="revert mini" data-id="' +
+          id +
+          '" type="button" title="Reverter para o resultado da API">↺</button>'
       : "";
   }
 
@@ -863,7 +1136,7 @@
   // (preserva foco e digitação): nomes resolvidos, realce do vencedor e a marca
   // de "editado" em todos os cards.
   function refreshKnockoutLabels() {
-    var cards = document.querySelectorAll('#knockout .bcard[data-id]');
+    var cards = document.querySelectorAll("#knockout .bcard[data-id]");
     Array.prototype.forEach.call(cards, function (card) {
       var m = findMatchById(card.getAttribute("data-id"));
       if (!m) return;
@@ -883,7 +1156,8 @@
       // as bandeiras — assim nunca tiramos o foco de um input em digitação.
       var pslot = card.querySelector(".bcard-pens-slot");
       if (pslot) {
-        var show = isTie(m), has = pslot.children.length > 0;
+        var show = isTie(m),
+          has = pslot.children.length > 0;
         if (show && !has) pslot.innerHTML = penaltiesHtml(m, matchId(m));
         else if (!show && has) pslot.innerHTML = "";
         else if (show && has) {
@@ -908,13 +1182,17 @@
     var s2 = document.querySelector('.score-in[data-id="' + sel + '"][data-side="s2"]');
     var p1 = document.querySelector('.pen-in[data-id="' + sel + '"][data-side="p1"]');
     var p2 = document.querySelector('.pen-in[data-id="' + sel + '"][data-side="p2"]');
-    function num(el) { return el && el.value !== "" ? parseInt(el.value, 10) : null; }
-    var a = num(s1), b = num(s2);
-    var pa = num(p1), pb = num(p2);
+    function num(el) {
+      return el && el.value !== "" ? parseInt(el.value, 10) : null;
+    }
+    var a = num(s1),
+      b = num(s2);
+    var pa = num(p1),
+      pb = num(p2);
     // mantém valores parciais (ex.: só o mandante preenchido) para não apagar
     // o que o usuário digitou; placares incompletos não contam na classificação.
-    var ft = (a === null && b === null) ? null : [a, b];
-    var p = (pa === null && pb === null) ? null : [pa, pb];
+    var ft = a === null && b === null ? null : [a, b];
+    var p = pa === null && pb === null ? null : [pa, pb];
     var m = findMatchById(id);
     if (!m) return;
     setOverride(m, ft, p);
@@ -938,7 +1216,9 @@
   function resetRowInputs(id, m) {
     var s = apiScore(m);
     function setVal(side, cls, val) {
-      var el = document.querySelector('.' + cls + '[data-id="' + cssEsc(id) + '"][data-side="' + side + '"]');
+      var el = document.querySelector(
+        "." + cls + '[data-id="' + cssEsc(id) + '"][data-side="' + side + '"]'
+      );
       if (el) el.value = val;
     }
     setVal("s1", "score-in", s && s.ft && s.ft[0] != null ? s.ft[0] : "");
@@ -954,14 +1234,18 @@
     return null;
   }
 
-  function cssEsc(s) { return String(s).replace(/(["\\|])/g, "\\$1"); }
+  function cssEsc(s) {
+    return String(s).replace(/(["\\|])/g, "\\$1");
+  }
 
   /* -------- query strings de teste (uso interno/admin; não documentadas) ----- */
 
   function getQuery() {
     var q = {};
-    (typeof location !== "undefined" ? location.search : "").replace(/^\?/, "")
-      .split("&").forEach(function (kv) {
+    (typeof location !== "undefined" ? location.search : "")
+      .replace(/^\?/, "")
+      .split("&")
+      .forEach(function (kv) {
         if (!kv) return;
         var i = kv.indexOf("=");
         var k = decodeURIComponent(i < 0 ? kv : kv.slice(0, i));
@@ -974,21 +1258,27 @@
   function parseSimDate(v) {
     var mt = String(v || "").match(/^(\d{1,2})-(\d{1,2})$/);
     if (!mt) return null;
-    var d = parseInt(mt[1], 10), mo = parseInt(mt[2], 10);
+    var d = parseInt(mt[1], 10),
+      mo = parseInt(mt[2], 10);
     if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
     return Date.UTC(2026, mo - 1, d, 0, 0);
   }
 
-  function randInt(lo, hi) { return lo + Math.floor(Math.random() * (hi - lo + 1)); }
+  function randInt(lo, hi) {
+    return lo + Math.floor(Math.random() * (hi - lo + 1));
+  }
 
   // Preenche TODOS os jogos com placares aleatórios, como se fossem edições do
   // usuário (vira override). Em jogos de mata-mata que empatarem, gera pênaltis
   // distintos para que o vencedor se resolva e o chaveamento avance.
   function applyFillRandom() {
     STATE.matches.forEach(function (m) {
-      var a = randInt(0, 4), b = randInt(0, 4), p = null;
+      var a = randInt(0, 4),
+        b = randInt(0, 4),
+        p = null;
       if (m.num != null && a === b) {
-        var pa = randInt(2, 5), pb = randInt(2, 5);
+        var pa = randInt(2, 5),
+          pb = randInt(2, 5);
         while (pb === pa) pb = randInt(2, 6);
         p = [pa, pb];
       }
@@ -1034,7 +1324,10 @@
     document.body.addEventListener("click", function (e) {
       var t = e.target;
       // botão "Ver jogos / Ocultar jogos" (fase de grupos)
-      if (t.closest && t.closest("#toggle-games")) { toggleGroupGames(); return; }
+      if (t.closest && t.closest("#toggle-games")) {
+        toggleGroupGames();
+        return;
+      }
       // reverter um placar editado para o valor da API
       if (t.classList && t.classList.contains("revert")) {
         var id = t.getAttribute("data-id");
@@ -1062,7 +1355,10 @@
     document.getElementById("tab-knockout").classList.toggle("active", phase === "knockout");
     // Ao entrar no mata-mata, reconstrói o chaveamento para refletir resultados
     // de grupos editados enquanto estávamos na outra aba (sem foco em risco).
-    if (phase === "knockout") { renderBracketOnly(); layoutBracket(); }
+    if (phase === "knockout") {
+      renderBracketOnly();
+      layoutBracket();
+    }
   }
 
   // render completo (carga inicial / atualização da API): reconstrói tudo,
@@ -1099,7 +1395,9 @@
       return m;
     });
     STATE.byNum = {};
-    STATE.matches.forEach(function (m) { if (m.num != null) STATE.byNum[m.num] = m; });
+    STATE.matches.forEach(function (m) {
+      if (m.num != null) STATE.byNum[m.num] = m;
+    });
   }
 
   function setStatus(text, kind) {
@@ -1111,10 +1409,13 @@
   function fetchData(isReload) {
     setStatus("Atualizando resultados…", "loading");
     return fetch(DATA_URL, { cache: "no-store" })
-      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      })
       .then(function (data) {
         annotateMatches(data);
-        applyTestQuery();           // ?fill=random | ?fill=reset (admin/teste)
+        applyTestQuery(); // ?fill=random | ?fill=reset (admin/teste)
         STATE.lastUpdated = new Date();
         renderAll();
 
@@ -1131,7 +1432,12 @@
         setStatus("Atualizado às " + hh + ":" + mm, "ok");
       })
       .catch(function (err) {
-        setStatus("Falha ao buscar dados da API (" + err.message + "). Resultados editados manualmente continuam válidos.", "error");
+        setStatus(
+          "Falha ao buscar dados da API (" +
+            err.message +
+            "). Resultados editados manualmente continuam válidos.",
+          "error"
+        );
         // ainda renderiza com o que houver (overrides) caso a API falhe
         if (!STATE.matches.length) {
           document.getElementById("groups").innerHTML =
@@ -1157,17 +1463,27 @@
     if (typeof ResizeObserver !== "undefined") {
       new ResizeObserver(apply).observe(header);
     }
-    window.addEventListener("resize", function () { apply(); sizeGroupGrid(); layoutBracket(); });
+    window.addEventListener("resize", function () {
+      apply();
+      sizeGroupGrid();
+      layoutBracket();
+    });
   }
 
   function init() {
     loadOverrides();
-    STATE.simNow = parseSimDate(getQuery().date);   // ?date=dd-mm (admin/teste)
+    STATE.simNow = parseSimDate(getQuery().date); // ?date=dd-mm (admin/teste)
     attachEditHandlers();
     setupFixedHeader();
-    document.getElementById("tab-groups").addEventListener("click", function () { setPhase("groups"); });
-    document.getElementById("tab-knockout").addEventListener("click", function () { setPhase("knockout"); });
-    document.getElementById("refresh").addEventListener("click", function () { fetchData(true); });
+    document.getElementById("tab-groups").addEventListener("click", function () {
+      setPhase("groups");
+    });
+    document.getElementById("tab-knockout").addEventListener("click", function () {
+      setPhase("knockout");
+    });
+    document.getElementById("refresh").addEventListener("click", function () {
+      fetchData(true);
+    });
     setPhase("groups");
     fetchData(false);
   }
@@ -1180,10 +1496,17 @@
   if (typeof module !== "undefined" && module.exports) {
     module.exports = {
       _state: STATE,
-      toGmt3: toGmt3, fmtTime: fmtTime, fmtDayLabel: fmtDayLabel,
-      computeStandings: computeStandings, computeThirdSlots: computeThirdSlots,
-      resolveRef: resolveRef, matchOutcome: matchOutcome, annotateMatches: annotateMatches,
-      effectiveScore: effectiveScore, matchId: matchId, sortRows: sortRows,
+      toGmt3: toGmt3,
+      fmtTime: fmtTime,
+      fmtDayLabel: fmtDayLabel,
+      computeStandings: computeStandings,
+      computeThirdSlots: computeThirdSlots,
+      resolveRef: resolveRef,
+      matchOutcome: matchOutcome,
+      annotateMatches: annotateMatches,
+      effectiveScore: effectiveScore,
+      matchId: matchId,
+      sortRows: sortRows,
       childMatches: childMatches
     };
   }

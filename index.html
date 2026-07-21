@@ -1,59 +1,69 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Copa do Mundo 2026 — Acompanhamento</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="preconnect" href="https://flagcdn.com">
-</head>
-<body>
-  <header class="topbar">
-    <div class="brand">
-      <span class="logo">⚽</span>
-      <div>
-        <h1>Copa do Mundo 2026</h1>
-        <p class="sub">Canadá · México · EUA — horários em <strong>GMT-3 (Brasília)</strong></p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Copa do Mundo 2026 — Acompanhamento</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://flagcdn.com" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">⚽</span>
+        <div>
+          <h1>Copa do Mundo 2026</h1>
+          <p class="sub">Canadá · México · EUA — horários em <strong>GMT-3 (Brasília)</strong></p>
+        </div>
       </div>
-    </div>
 
-    <div class="phase-tabs" role="tablist" aria-label="Fases do torneio">
-      <button id="tab-groups" class="tab" role="tab" type="button">Fase de Grupos</button>
-      <button id="tab-knockout" class="tab" role="tab" type="button">Fase Eliminatória</button>
-    </div>
+      <div class="phase-tabs" role="tablist" aria-label="Fases do torneio">
+        <button id="tab-groups" class="tab" role="tab" type="button">Fase de Grupos</button>
+        <button id="tab-knockout" class="tab" role="tab" type="button">Fase Eliminatória</button>
+      </div>
 
-    <div class="refresh-area">
-      <button id="refresh" class="refresh-btn" type="button" title="Buscar resultados na API novamente">↻ Atualizar</button>
-      <span id="status" class="status"></span>
-    </div>
-  </header>
+      <div class="refresh-area">
+        <button
+          id="refresh"
+          class="refresh-btn"
+          type="button"
+          title="Buscar resultados na API novamente"
+        >
+          ↻ Atualizar
+        </button>
+        <span id="status" class="status"></span>
+      </div>
+    </header>
 
-  <section class="upcoming">
-    <h2>Próximos jogos</h2>
-    <div id="upcoming-list" class="upcoming-list"></div>
-  </section>
+    <section class="upcoming">
+      <h2>Próximos jogos</h2>
+      <div id="upcoming-list" class="upcoming-list"></div>
+    </section>
 
-  <main>
-    <section id="groups" class="phase-section"></section>
-    <section id="knockout" class="phase-section hidden"></section>
-  </main>
+    <main>
+      <section id="groups" class="phase-section"></section>
+      <section id="knockout" class="phase-section hidden"></section>
+    </main>
 
-  <footer class="foot">
-    <div class="legend">
-      <span><span class="swatch swatch-auto"></span> resultado automático (API)</span>
-      <span><span class="swatch swatch-edited"></span> resultado editado por você</span>
-      <span><span class="swatch swatch-qual"></span> classificado (confirmado)</span>
-      <span><span class="swatch swatch-third"></span> 3º colocado (pode avançar)</span>
-      <span><span class="swatch swatch-out"></span> eliminado</span>
-    </div>
-    <p class="credit">
-      Dados: <a href="https://github.com/openfootball/worldcup.json" target="_blank" rel="noopener">openfootball</a>
-      (atualizado a cada recarregamento). Bandeiras: flagcdn.com.
-      Resultados editados ficam salvos neste navegador e não são sobrescritos pela API.
-    </p>
-  </footer>
+    <footer class="foot">
+      <div class="legend">
+        <span><span class="swatch swatch-auto"></span> resultado automático (API)</span>
+        <span><span class="swatch swatch-edited"></span> resultado editado por você</span>
+        <span><span class="swatch swatch-qual"></span> classificado (confirmado)</span>
+        <span><span class="swatch swatch-third"></span> 3º colocado (pode avançar)</span>
+        <span><span class="swatch swatch-out"></span> eliminado</span>
+      </div>
+      <p class="credit">
+        Dados:
+        <a href="https://github.com/openfootball/worldcup.json" target="_blank" rel="noopener"
+          >openfootball</a
+        >
+        (atualizado a cada recarregamento). Bandeiras: flagcdn.com. Resultados editados ficam salvos
+        neste navegador e não são sobrescritos pela API.
+      </p>
+    </footer>
 
-  <script src="countries.js"></script>
-  <script src="app.js"></script>
-</body>
+    <script src="countries.js"></script>
+    <script src="app.js"></script>
+  </body>
 </html>

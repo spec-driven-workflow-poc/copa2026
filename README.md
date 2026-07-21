@@ -30,12 +30,12 @@ a tabela oficial da FIFA pode alocar os mesmos times em posições diferentes.
 
 ## Arquivos
 
-| Arquivo        | Função                                                        |
-|----------------|---------------------------------------------------------------|
-| `index.html`   | Estrutura da página                                           |
-| `styles.css`   | Visual, tooltips, tabelas e o chaveamento                     |
-| `countries.js` | Nomes dos 48 países em português + código da bandeira         |
-| `app.js`       | Busca na API, classificação, fuso, edição e mata-mata         |
+| Arquivo        | Função                                                |
+| -------------- | ----------------------------------------------------- |
+| `index.html`   | Estrutura da página                                   |
+| `styles.css`   | Visual, tooltips, tabelas e o chaveamento             |
+| `countries.js` | Nomes dos 48 países em português + código da bandeira |
+| `app.js`       | Busca na API, classificação, fuso, edição e mata-mata |
 
 ## Fonte de dados
 
