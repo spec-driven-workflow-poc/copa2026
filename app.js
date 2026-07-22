@@ -12,6 +12,7 @@
   var DATA_URL =
     "https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json";
   var STORAGE_KEY = "wc2026_overrides_v1";
+  var THEME_KEY = "wc2026_theme_v1";
 
   // Estado global
   var STATE = {
@@ -120,11 +121,9 @@
       /* ignore */
     }
   }
-  // FOLLOW-UP (ADR-0002): quando uma 2ª preferência de usuário for persistida
-  // (ex.: tema), promover estas chaves soltas para um helper `prefs` namespaced
-  // — leitura/escrita centralizadas sob o prefixo wc2026_*_v1. Ver o design.md do
-  // change `persist-score-overrides`. Acionar quando este arquivo for tocado por
-  // uma feature que persista preferência nova.
+  // NOTA (ADR-0002): a 2ª preferência de usuário (tema) introduziu o helper
+  // `prefs` namespaced abaixo. Os overrides seguem em sua própria chave
+  // (`wc2026_overrides_v1`); roteá-los por `prefs` é refino futuro (fora de APR-02).
   function setOverride(m, ft, p) {
     STATE.overrides[matchId(m)] = { ft: ft, p: p || null };
     saveOverrides();
@@ -132,6 +131,87 @@
   function clearOverride(m) {
     delete STATE.overrides[matchId(m)];
     saveOverrides();
+  }
+
+  /* --------------------------- preferências / tema ---------------------- */
+  // Helper `prefs` namespaced (ADR-0002): leitura/escrita centralizadas sob o
+  // prefixo wc2026_*_v1, degradando com segurança. Recebe o storage para ser
+  // testável (funções puras) sem depender do localStorage do navegador.
+  function makePrefs(store) {
+    return {
+      get: function (key, dflt) {
+        try {
+          var raw = store.getItem(key);
+          return raw == null ? dflt : JSON.parse(raw);
+        } catch (e) {
+          return dflt;
+        }
+      },
+      set: function (key, value) {
+        try {
+          store.setItem(key, JSON.stringify(value));
+        } catch (e) {
+          /* ignore */
+        }
+      }
+    };
+  }
+
+  function defaultStore() {
+    try {
+      if (typeof window !== "undefined" && window.localStorage) return window.localStorage;
+    } catch (e) {
+      /* acesso bloqueado (ex.: modo privado) */
+    }
+    return {
+      getItem: function () {
+        return null;
+      },
+      setItem: function () {}
+    };
+  }
+
+  var prefs = makePrefs(defaultStore());
+
+  // Resolve o tema EFETIVO (puro): light/dark explícitos vencem; system — ou
+  // qualquer valor inválido — segue a preferência do SO (default seguro).
+  function resolveTheme(pref, systemPrefersDark) {
+    if (pref === "light" || pref === "dark") return pref;
+    return systemPrefersDark ? "dark" : "light";
+  }
+
+  function darkModeMQL() {
+    return typeof window !== "undefined" && typeof window.matchMedia === "function"
+      ? window.matchMedia("(prefers-color-scheme: dark)")
+      : null;
+  }
+
+  // Grava o tema efetivo em data-theme (o CSS só conhece light|dark).
+  function applyTheme(pref) {
+    var mql = darkModeMQL();
+    var effective = resolveTheme(pref, mql ? mql.matches : false);
+    document.documentElement.setAttribute("data-theme", effective);
+  }
+
+  function setupThemeControl() {
+    var pref = prefs.get(THEME_KEY, "system");
+    applyTheme(pref);
+    var sel = document.getElementById("theme-select");
+    if (sel) {
+      sel.value = pref;
+      sel.addEventListener("change", function () {
+        pref = sel.value;
+        prefs.set(THEME_KEY, pref);
+        applyTheme(pref);
+      });
+    }
+    // Em `system`, reflete ao vivo a troca de tema do SO (sem reload).
+    var mql = darkModeMQL();
+    if (mql && typeof mql.addEventListener === "function") {
+      mql.addEventListener("change", function () {
+        if (prefs.get(THEME_KEY, "system") === "system") applyTheme("system");
+      });
+    }
   }
 
   /* --------------------------- classificação ---------------------------- */
@@ -1477,6 +1557,7 @@
 
   function init() {
     loadOverrides();
+    setupThemeControl();
     STATE.simNow = parseSimDate(getQuery().date); // ?date=dd-mm (admin/teste)
     attachEditHandlers();
     setupFixedHeader();
@@ -1512,7 +1593,9 @@
       effectiveScore: effectiveScore,
       matchId: matchId,
       sortRows: sortRows,
-      childMatches: childMatches
+      childMatches: childMatches,
+      makePrefs: makePrefs,
+      resolveTheme: resolveTheme
     };
   }
 })();

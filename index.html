@@ -6,6 +6,25 @@
     <title>Copa do Mundo 2026 — Acompanhamento</title>
     <link rel="stylesheet" href="styles.css" />
     <link rel="preconnect" href="https://flagcdn.com" />
+    <script>
+      // Aplica o tema salvo ANTES do primeiro paint (anti-flash). Espelha o
+      // mínimo de prefs/resolveTheme (app.js) para o instante pré-app; `system`
+      // (ou ausência) segue prefers-color-scheme. data-theme guarda o efetivo.
+      (function () {
+        try {
+          var raw = localStorage.getItem("wc2026_theme_v1");
+          var pref = raw == null ? "system" : JSON.parse(raw);
+          var dark =
+            pref === "dark" ||
+            (pref !== "light" &&
+              window.matchMedia &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+        } catch (e) {
+          /* mantém o tema padrão (claro) */
+        }
+      })();
+    </script>
   </head>
   <body>
     <header class="topbar">
@@ -23,6 +42,14 @@
       </div>
 
       <div class="refresh-area">
+        <label class="theme-field">
+          <span class="sr-only">Tema</span>
+          <select id="theme-select" class="theme-select" aria-label="Tema">
+            <option value="light">☀️ Claro</option>
+            <option value="dark">🌙 Escuro</option>
+            <option value="system">🖥️ Sistema</option>
+          </select>
+        </label>
         <button
           id="refresh"
           class="refresh-btn"

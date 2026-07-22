@@ -1,15 +1,19 @@
 /* ====================== Copa do Mundo 2026 — estilos ====================== */
-/* FOLLOW-UP (ADR-0003): há cores hardcoded fora dos tokens do :root — gradiente
-   da topbar (#ffffff/#f4f7fb), fundo das abas (#e3e9f1), tooltip (#1f2a36),
-   fundos de input (#fff). Ao introduzir o tema escuro, extrair estes literais
-   para custom properties (tokens) para que o override de tema os alcance.
-   Acionar no change `dark-mode` (APR-02). Ver design.md de `establish-ui-shell`. */
+/* TEMA (ADR-0003): toda cor flui por tokens no :root. O tema escuro é o único
+   bloco de override abaixo (:root[data-theme="dark"]); nenhuma regra carrega
+   literal de cor. `data-theme` guarda sempre o tema EFETIVO (light|dark) — o
+   modo `system` é resolvido em JS (app.js: resolveTheme + matchMedia). Os
+   literais antes hardcoded (gradiente da topbar, fundo das abas, tooltip,
+   fundos de input, etc.) já estão extraídos para os tokens abaixo. (APR-02) */
 :root {
   --bg: #eef1f5;
   --card: #ffffff;
+  --surface: #ffffff; /* inputs, botões e cartões brancos */
   --ink: #16202b;
+  --on-accent: #ffffff; /* texto sobre superfícies de cor sólida */
   --muted: #6b7785;
   --line: #cfd8e3;
+  --row-line: #eef1f5; /* separador de linha da tabela */
   --accent: #0f7a4d; /* verde campo */
   --accent-2: #0b5cab; /* azul */
   --gold: #c79100;
@@ -18,8 +22,66 @@
   --qual: #0f7a4d;
   --third: #b58900;
   --out: #c62828; /* vermelho — eliminado */
+  --topbar-1: #ffffff; /* gradiente da topbar */
+  --topbar-2: #f4f7fb;
+  --topbar-shadow: 0 2px 10px rgba(20, 30, 45, 0.1), 0 1px 2px rgba(20, 30, 45, 0.06);
+  --tab-bg: #e3e9f1; /* trilho das abas de fase */
+  --flag-bg: #dde3ea; /* fundo da bandeira enquanto carrega */
+  --flag-ring: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  --flag-ph-1: #e7ebf0; /* placeholder de bandeira (hachura) */
+  --flag-ph-2: #dfe5ec;
+  --conf-green-bg: rgba(15, 122, 77, 0.1); /* realce de linha classificada */
+  --conf-yellow-bg: rgba(181, 137, 0, 0.13);
+  --conf-red-bg: rgba(198, 40, 40, 0.1);
+  --tooltip-bg: #1f2a36;
+  --tooltip-ink: #ffffff;
+  --final-glow: 0 0 0 2px rgba(199, 145, 0, 0.3), 0 6px 18px rgba(199, 145, 0, 0.18);
+  --swatch-qual: rgba(15, 122, 77, 0.5); /* chips da legenda */
+  --swatch-third: rgba(181, 137, 0, 0.55);
+  --swatch-out: rgba(198, 40, 40, 0.5);
+  --bline: #c2cdda; /* linhas conectoras do chaveamento */
   --shadow: 0 1px 3px rgba(20, 30, 45, 0.08), 0 1px 2px rgba(20, 30, 45, 0.06);
   --radius: 12px;
+}
+
+/* Tema escuro — único bloco de override de tokens (ADR-0003). Aplicado quando o
+   tema efetivo é escuro (dark explícito OU system + SO escuro; resolvido em JS). */
+:root[data-theme="dark"] {
+  --bg: #0f1621;
+  --card: #18232f;
+  --surface: #18232f;
+  --ink: #e7edf3;
+  --on-accent: #ffffff;
+  --muted: #98a6b5;
+  --line: #2c3a49;
+  --row-line: #223040;
+  --accent: #35b07f;
+  --accent-2: #4fa3e8;
+  --gold: #e0aa2b;
+  --edited: #ff824d;
+  --edited-bg: #3a2417;
+  --qual: #35b07f;
+  --third: #e0aa2b;
+  --out: #e35d5d;
+  --topbar-1: #1b2734;
+  --topbar-2: #131d28;
+  --topbar-shadow: 0 2px 10px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.35);
+  --tab-bg: #0f1a26;
+  --flag-bg: #2c3a49;
+  --flag-ring: 0 0 0 1px rgba(255, 255, 255, 0.12);
+  --flag-ph-1: #223040;
+  --flag-ph-2: #1a2734;
+  --conf-green-bg: rgba(53, 176, 127, 0.16);
+  --conf-yellow-bg: rgba(224, 170, 43, 0.16);
+  --conf-red-bg: rgba(227, 93, 93, 0.16);
+  --tooltip-bg: #2f3e4d;
+  --tooltip-ink: #e7edf3;
+  --final-glow: 0 0 0 2px rgba(224, 170, 43, 0.35), 0 6px 18px rgba(0, 0, 0, 0.5);
+  --swatch-qual: rgba(53, 176, 127, 0.55);
+  --swatch-third: rgba(224, 170, 43, 0.6);
+  --swatch-out: rgba(227, 93, 93, 0.55);
+  --bline: #35485a;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 * {
@@ -71,11 +133,9 @@ a {
   gap: 18px;
   flex-wrap: wrap;
   padding: 12px 20px;
-  background: linear-gradient(180deg, #ffffff, #f4f7fb);
+  background: linear-gradient(180deg, var(--topbar-1), var(--topbar-2));
   border-bottom: 1px solid var(--line);
-  box-shadow:
-    0 2px 10px rgba(20, 30, 45, 0.1),
-    0 1px 2px rgba(20, 30, 45, 0.06);
+  box-shadow: var(--topbar-shadow);
 }
 .brand {
   display: flex;
@@ -98,7 +158,7 @@ a {
 
 .phase-tabs {
   display: inline-flex;
-  background: #e3e9f1;
+  background: var(--tab-bg);
   border-radius: 999px;
   padding: 4px;
   border: 1px solid var(--line);
@@ -119,7 +179,7 @@ a {
 }
 .tab.active {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   box-shadow: var(--shadow);
 }
 
@@ -130,7 +190,7 @@ a {
 }
 .refresh-btn {
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   padding: 8px 14px;
   border-radius: 8px;
@@ -156,6 +216,40 @@ a {
 }
 .status.loading {
   color: var(--accent-2);
+}
+
+/* seletor de tema (claro/escuro/sistema) */
+.theme-field {
+  display: inline-flex;
+  align-items: center;
+}
+.theme-select {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+}
+.theme-select:hover {
+  border-color: var(--accent);
+}
+.theme-select:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 1px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ----------------------------- próximos jogos --------------------------- */
@@ -245,16 +339,22 @@ a {
   height: 16px;
   border-radius: 2px;
   object-fit: cover;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--flag-ring);
   flex: 0 0 auto;
-  background: #dde3ea;
+  background: var(--flag-bg);
 }
 .flag-lg {
   width: 28px;
   height: 20px;
 }
 .flag-ph {
-  background: repeating-linear-gradient(45deg, #e7ebf0, #e7ebf0 4px, #dfe5ec 4px, #dfe5ec 8px);
+  background: repeating-linear-gradient(
+    45deg,
+    var(--flag-ph-1),
+    var(--flag-ph-1) 4px,
+    var(--flag-ph-2) 4px,
+    var(--flag-ph-2) 8px
+  );
 }
 .est {
   color: var(--gold);
@@ -274,7 +374,7 @@ main {
 }
 .toggle-games {
   border: 1px solid var(--accent);
-  background: #fff;
+  background: var(--surface);
   color: var(--accent);
   padding: 9px 18px;
   border-radius: 999px;
@@ -289,11 +389,11 @@ main {
 }
 .toggle-games:hover {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 .toggle-games[aria-pressed="true"] {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 /* O mínimo de cada coluna é a LARGURA DE CONTEÚDO real do card (medida em JS e
@@ -335,7 +435,7 @@ main {
   border-bottom: 2px solid var(--line);
 }
 .standings tbody tr {
-  border-bottom: 1px solid #eef1f5;
+  border-bottom: 1px solid var(--row-line);
 }
 .standings tbody tr:last-child {
   border-bottom: 0;
@@ -365,19 +465,19 @@ main {
   position: relative;
 }
 .standings tbody tr.conf-green {
-  background: rgba(15, 122, 77, 0.1);
+  background: var(--conf-green-bg);
 }
 .standings tbody tr.conf-green td.pos {
   box-shadow: inset 3px 0 0 var(--qual);
 }
 .standings tbody tr.conf-yellow {
-  background: rgba(181, 137, 0, 0.13);
+  background: var(--conf-yellow-bg);
 }
 .standings tbody tr.conf-yellow td.pos {
   box-shadow: inset 3px 0 0 var(--third);
 }
 .standings tbody tr.conf-red {
-  background: rgba(198, 40, 40, 0.1);
+  background: var(--conf-red-bg);
 }
 .standings tbody tr.conf-red td.pos {
   box-shadow: inset 3px 0 0 var(--out);
@@ -407,8 +507,8 @@ main {
   bottom: 150%;
   left: 50%;
   transform: translateX(-50%);
-  background: #1f2a36;
-  color: #fff;
+  background: var(--tooltip-bg);
+  color: var(--tooltip-ink);
   padding: 7px 10px;
   border-radius: 6px;
   font-size: 12px;
@@ -428,7 +528,7 @@ main {
   left: 50%;
   transform: translateX(-50%);
   border: 6px solid transparent;
-  border-top-color: #1f2a36;
+  border-top-color: var(--tooltip-bg);
 }
 /* colunas à direita: tooltip abre para a esquerda, sem vazar da tela */
 .info.tip-left .tip {
@@ -514,7 +614,7 @@ main {
   font-weight: 700;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
 }
 .pen-in {
@@ -550,7 +650,7 @@ main {
 .edited-badge {
   font-size: 11px;
   font-weight: 700;
-  color: #fff;
+  color: var(--on-accent);
   background: var(--edited);
   padding: 1px 7px;
   border-radius: 999px;
@@ -561,7 +661,7 @@ main {
 .revert {
   border: 1px solid var(--edited);
   color: var(--edited);
-  background: #fff;
+  background: var(--surface);
   border-radius: 6px;
   font-size: 11px;
   padding: 2px 8px;
@@ -570,7 +670,7 @@ main {
 }
 .revert:hover {
   background: var(--edited);
-  color: #fff;
+  color: var(--on-accent);
 }
 .revert.mini {
   padding: 1px 6px;
@@ -580,7 +680,6 @@ main {
 :root {
   --bcard-w: 122px;
   --bgap: 12px;
-  --bline: #c2cdda;
 }
 .ko-note {
   color: var(--muted);
@@ -744,10 +843,7 @@ main {
 .bcard.is-final {
   border-color: var(--gold);
   width: calc(var(--bcard-w) + 12px);
-  box-shadow:
-    0 0 0 2px rgba(199, 145, 0, 0.3),
-    0 6px 18px rgba(199, 145, 0, 0.18),
-    var(--shadow);
+  box-shadow: var(--final-glow), var(--shadow);
 }
 /* conectores curtos da FINAL até as duas semifinais (laterais) */
 .bcard.is-final::before,
@@ -885,7 +981,7 @@ main {
 .foot {
   padding: 20px;
   border-top: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface);
 }
 .legend {
   display: flex;
@@ -908,20 +1004,20 @@ main {
   border: 1px solid var(--line);
 }
 .swatch-auto {
-  background: #fff;
+  background: var(--surface);
 }
 .swatch-edited {
   background: var(--edited);
   border-color: var(--edited);
 }
 .swatch-qual {
-  background: rgba(15, 122, 77, 0.5);
+  background: var(--swatch-qual);
 }
 .swatch-third {
-  background: rgba(181, 137, 0, 0.55);
+  background: var(--swatch-third);
 }
 .swatch-out {
-  background: rgba(198, 40, 40, 0.5);
+  background: var(--swatch-out);
 }
 .credit {
   font-size: 12px;
