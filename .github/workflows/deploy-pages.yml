@@ -23,10 +23,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      # enablement: cria o site do Pages (source = GitHub Actions) no 1º run.
+      # Pages já habilitado (source = GitHub Actions) via API pelo admin do repo.
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
       # Site é HTML/CSS/JS puro na raiz (ADR-0001, sem build); copia só os
       # arquivos servidos para _site, deixando docs/openspec/node_modules fora.
       - name: Stage static site
