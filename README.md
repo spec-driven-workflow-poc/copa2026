@@ -58,6 +58,14 @@ Nada acima é adjetivo: cada mecanismo já está materializado em arquivos deste
   o branch `prebuilt/dark-mode` é a **rede de segurança** pré-construída. Veja o
   [ROADMAP](docs/ROADMAP.md) → _Milestones → M2 — Demo_.
 
+> **Nota — "🔲" no ROADMAP não quer dizer "não construído".** O app já está inteiro no código
+> (`app.js`, `styles.css`, …); este repo **deriva specs de comportamento já existente**. Como as
+> specs são **emergentes** (só nascem quando um change é arquivado via `archive`), no
+> [ROADMAP](docs/ROADMAP.md) 🔲 significa _"comportamento já no código, spec ainda não promovida"_
+> e 🟢 _"change arquivado → spec emergiu"_ — **não** "feature faltando". Só `dark-mode` (APR-02) é
+> código **genuinamente novo**, escrito ao vivo na demo. Por isso `openspec/specs/` traz **2 de 8**
+> changes: é o _ledger_ dos arquivados, não uma pasta a preencher de antemão.
+
 ### Fontes canônicas (a mecânica mora aqui)
 
 Esta seção **prioriza a clareza da apresentação** e, por isso, resume de propósito conceitos que têm
