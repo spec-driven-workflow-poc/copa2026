@@ -1,0 +1,40 @@
+name: deploy-pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Permissões mínimas do GITHUB_TOKEN para publicar no Pages via Actions.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Uma publicação por vez; não cancela a que já está no ar.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      # enablement: cria o site do Pages (source = GitHub Actions) no 1º run.
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      # Site é HTML/CSS/JS puro na raiz (ADR-0001, sem build); copia só os
+      # arquivos servidos para _site, deixando docs/openspec/node_modules fora.
+      - name: Stage static site
+        run: |
+          mkdir -p _site
+          cp index.html app.js countries.js styles.css _site/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
