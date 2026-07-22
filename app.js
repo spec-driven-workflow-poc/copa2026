@@ -205,11 +205,13 @@
         applyTheme(pref);
       });
     }
-    // Em `system`, reflete ao vivo a troca de tema do SO (sem reload).
+    // Em `system`, reflete ao vivo a troca de tema do SO (sem reload). Usa o
+    // `pref` em memória (não relê o storage, que mente quando bloqueado — senão
+    // uma troca do SO sobrescreveria uma escolha explícita light/dark).
     var mql = darkModeMQL();
     if (mql && typeof mql.addEventListener === "function") {
       mql.addEventListener("change", function () {
-        if (prefs.get(THEME_KEY, "system") === "system") applyTheme("system");
+        if (pref === "system") applyTheme("system");
       });
     }
   }
