@@ -1416,7 +1416,7 @@ git commit -m "feat(apresentacao): document establish-ui-shell; archive ui-shell
 
   Run: `grep -rn "dark-mode\|APR-02\|FR-APR2" AGENTS.md README.md docs/ROADMAP.md docs/capabilities docs/adr docs/architecture` → expect no output. Then `make check` → green (docs-only; coverage unchanged at 23.45%).
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add docs/capabilities/apresentacao docs/ROADMAP.md docs/adr/0002-persistencia-no-cliente.md \
@@ -1739,7 +1739,26 @@ git checkout main
   change (kebab-case, `apresentacao`, effort S, risk low, **T1**, deps `APR-01, ADR-0002, ADR-0003`);
   **no new ADR**; both planted follow-ups recorded as implementation debt.
 
-- [ ] **Step 1: Confirm the pre-theme snapshot**
+> ### ▶ Prompt-per-step convention — applies to Tasks 14.6 **and** 15
+>
+> **The presentation does NOT execute these prompts live.** Per the Direction update (2026-07-22,
+> Decision 1), the demo **showcases the pre-captured session history + the artifacts** produced at each
+> step; the live act is **narrating that capture** (Task 15 Step 4), not driving Claude Code on stage.
+>
+> What this convention governs is the **off-stage capture run** that produces that session history. To
+> make the showcased session trustworthy, the capture must be driven **one discrete prompt per natural
+> boundary** — never one giant auto-run — so that in the recorded history **every workflow step appears as
+> its own human prompt → agent outcome → artifact**. At each boundary the executing agent completes the
+> step, then **stops and waits** for the operator to enter the next prompt, so the boundary is visible in
+> the transcript.
+>
+> Each boundary is written below as a **`▶ Próximo prompt`** block: the exact prompt to enter at that step
+> **during the capture run**. These same prompts double as **showcase anchors** — the narration transcript
+> points at each one and its resulting artifact. Verification/confirmation steps a real user would *not*
+> type (grep checks, reading the capture) are off-stage agent work, labelled as such, and get no prompt
+> block.
+
+- [x] **Step 1: (off-stage, agent) Confirm the pre-theme snapshot**
 
 Run:
 
@@ -1751,14 +1770,23 @@ grep -rn "dark-mode\|APR-02\|FR-APR2" docs/capabilities docs/ROADMAP.md docs/adr
 Expected: no output — nothing names the theme change in the layer intake reads. (If a row exists, intake
 §2 would dedup-STOP; fix before running.)
 
-- [ ] **Step 2: Invoke `requirement-intake` (single mode) with the free-text requirement**
+- [ ] **Step 2: STOP — enter the `requirement-intake` prompt (capture run)**
 
-Invoke the `requirement-intake` skill with a requirement such as:
+This is the capture's opening natural prompt boundary: the requirement enters the system as its **own
+discrete prompt**, so the recorded session opens on a clear human-driven step (not a pre-baked plan). The
+executing agent must **not** invoke the skill on its own — it prints the block below, then stops and waits
+for the operator to enter it.
 
-> "Quero um seletor de tema na página: alternar entre claro, escuro e seguir o sistema, e que a página
-> lembre a escolha entre visitas."
+> #### ▶ Próximo prompt
+>
+> ```
+> /requirement-intake Quero um seletor de tema na página: alternar entre claro, escuro e seguir o
+> sistema, e que a página lembre a escolha entre visitas.
+> ```
 
-Let the skill drive. The beats to expect (each is a narration point in Task 15 Step 4):
+Once entered, `requirement-intake` drives §1–§7 in one pass (that internal fan-out is the skill's own
+behavior, not something entered beat-by-beat). The beats to expect during that run — each a discrete
+artifact/outcome the showcase points at, and a narration point in Task 15 Step 4:
 
 1. **Load context (§1):** reads the briefs/change-maps/ADRs/ROADMAP; no theme change exists yet.
 2. **Classify + dedup (§2):** restates the requirement; confirms it is **not** a duplicate → proceeds.
@@ -1778,7 +1806,7 @@ Let the skill drive. The beats to expect (each is a narration point in Task 15 S
    interruption." For the demo, opening the draft `plan/<slug>` PR is optional — narrate the concept
    even if you keep the artifacts on the working tree / worktree branch that Task 15 continues on.
 
-- [ ] **Step 3: Confirm intake produced the expected planning (against the answer key above)**
+- [ ] **Step 3: (off-stage, agent) Confirm intake produced the expected planning (against the answer key above)**
 
 Verify the change-map now has a single theme change row at **T1** with deps `APR-01, ADR-0002, ADR-0003`,
 the brief has the theme FR, the ROADMAP has the `🔲` rollup row, **no** new `docs/adr/NNNN-*.md` was
@@ -1823,7 +1851,14 @@ own authored file is `docs/superpowers/demo-script.md` (Step 4).
   authored deliverable). Plus the repo's advance to its final end state (theme change merged to `main`,
   `color-theme` archived, its ROADMAP row → `🟢`) — repo hygiene, not a demo deliverable.
 
-- [ ] **Step 1: Confirm the clean starting state**
+> **Prompt-per-step capture (see the ▶ convention in Task 14.6).** This Step 2 is the **off-stage capture
+> run**, not a live-on-stage act. It is split into phases **2.1–2.7**, one per natural prompt boundary. At
+> each, the agent completes the phase, prints a **`▶ Próximo prompt`** block, then **stops and waits** for
+> the operator to enter it — so each step lands in the session history as its own prompt → outcome →
+> artifact. The agent never chains from one phase into the next on its own; that discreteness is what makes
+> the later showcase trustworthy.
+
+- [ ] **Step 1: (off-stage, agent) Confirm the clean starting state**
 
 Run:
 
@@ -1835,23 +1870,105 @@ make check                                    # green
 ```
 
 Expected: the theme change reserved as `🔲` (created by intake, Task 14.6); zero theme code on main; gates green.
+When green, **STOP** — Step 2.1 is the first prompt of the capture run.
 
-- [ ] **Step 2: Run the live cycle via `workflow-execute-change` (fresh)**
+- [ ] **Step 2: Run the live cycle via `workflow-execute-change` (fresh) — presenter-driven, phase by phase**
 
-Invoke `workflow-execute-change <theme-change>` (the name intake minted; expected `dark-mode`). Let the
-skill drive — the session history it generates, **together with the intake session history from Task
-14.6**, is the demo. The beats to expect:
+The session history this generates, **together with the intake session history from Task 14.6**, is what
+the presentation showcases. `<theme-change>` = the name intake minted in Task 14.6 (expected `dark-mode`);
+substitute the actual name used. Run the phases **in order**; each ends with the agent stopping for the
+next capture prompt.
 
-1. Pre-flight: matches the theme change row intake created; deps `APR-01 🟢`, `ADR-0002/0003 Accepted`; **the two follow-ups are already recorded in intake's decomposition** (Task 14.6 caught them via the ADRs) — pre-flight confirms them and execution will *action* them (introduce the `prefs` helper; tokenize the hardcoded colors).
-2. Mark `doing` (🔲→🟡) on the worktree branch — single ROADMAP cell (never lands on `main`).
-3. Worktree + `openspec-propose <theme-change>` (**T1 spec-lite — no `design.md`**; spec-id `color-theme`). Narration: the tier was **derived by intake** (Task 14.6) and is now **read from the change-map** and obeyed — "the agent doesn't choose the ceremony, planning fixed it."
-4. **Align — human-driven disagreement:** the presenter proposes cookie / "toggle forces theme, ignore OS". The agent must push back citing **ADR-0002** (localStorage, not cookie) and **ADR-0003** (`system` is a first-class value). Land on localStorage + `light|dark|system`.
-5. `openspec-apply-change` — **implement fresh (TDD), guided only by the ADRs + planted breadcrumbs**, not by any reference branch. Fill the apply wait with the archived `establish-ui-shell` `design.md` (`openspec/changes/archive/establish-ui-shell/design.md`) — demonstrates a `design.md` from a **T2** change without `dark-mode` (T1) needing one, exactly as the presentation's Tier Note prescribes.
-6. `make check` green; `workflow-code-review` (Layer A).
-7. Reveal: open `index.html`, toggle to dark on the projector.
-8. Archive `color-theme` → `openspec/specs/color-theme/spec.md` (on the worktree branch).
+- [ ] **Step 2.1 — Kick off execution (enter the prompt)**
 
-- [ ] **Step 3: Confirm the session history captured every step and its outcome**
+> #### ▶ Próximo prompt
+>
+> ```
+> /workflow-execute-change <theme-change>
+> ```
+
+The agent then runs, **without further prompts**, the phases the skill owns internally up to the align
+checkpoint: **pre-flight** (matches the theme change row intake created; deps `APR-01 🟢`,
+`ADR-0002/0003 Accepted`; the two follow-ups already recorded in intake's decomposition — pre-flight
+confirms them and execution will *action* them: introduce the `prefs` helper, tokenize the hardcoded
+colors) → **mark `doing`** (🔲→🟡, single ROADMAP cell on the worktree branch, never on `main`) →
+**worktree + `openspec-propose`** (**T1 spec-lite — no `design.md`**; spec-id `color-theme`; the tier was
+*derived by intake* and is now *read from the change-map* and obeyed — "the agent doesn't choose the
+ceremony, planning fixed it"). The agent then reaches the **align checkpoint and STOPS**, handing back for
+Step 2.2.
+
+- [ ] **Step 2.2 — Align, the headline pushback (enter the disagreement)**
+
+The strongest "frozen decisions persist" beat. During the capture, the operator deliberately enters an
+approach that violates the ADRs:
+
+> #### ▶ Próximo prompt
+>
+> ```
+> Vamos guardar o tema num cookie, e o botão deve forçar claro/escuro direto — pode ignorar a
+> preferência do sistema.
+> ```
+
+The agent must **push back**, citing **ADR-0002** (state persists in `localStorage`, not cookies) and
+**ADR-0003** (`system` is a first-class theme value), and propose `localStorage` + `light|dark|system`.
+It then **STOPS** awaiting the resolution (Step 2.3) — it must **not** self-resolve the disagreement (the
+recorded pushback-then-human-decision exchange is the beat the showcase replays).
+
+- [ ] **Step 2.3 — Align resolution (accept the ADR-aligned approach)**
+
+> #### ▶ Próximo prompt
+>
+> ```
+> Faz sentido — segue o que as ADRs mandam: localStorage e os três valores claro/escuro/sistema.
+> Pode fechar a proposal assim.
+> ```
+
+The agent finalizes the proposal/spec-delta on the ADR-aligned design, then **STOPS** awaiting the
+go-ahead to implement (Step 2.4).
+
+- [ ] **Step 2.4 — Proceed to apply (authorize implementation)**
+
+> #### ▶ Próximo prompt
+>
+> ```
+> Aprovado. Pode aplicar (openspec-apply-change) e implementar.
+> ```
+
+The agent runs `openspec-apply-change` and **implements fresh (TDD), guided only by the ADRs + planted
+breadcrumbs** (no reference branch), then runs `make check`. While the apply runs, narrate over the
+archived `establish-ui-shell` `design.md` (`openspec/changes/archive/establish-ui-shell/design.md`) — a
+`design.md` from a **T2** change, shown precisely because this **T1** change needs none, per the
+presentation's Tier Note. On green gates the agent **STOPS**, handing back for review (Step 2.5).
+
+- [ ] **Step 2.5 — Local review (invoke Layer A)**
+
+> #### ▶ Próximo prompt
+>
+> ```
+> /workflow-code-review
+> ```
+
+The agent runs the Layer A review over the diff and reports findings, then **STOPS** for the reveal
+(Step 2.6).
+
+- [ ] **Step 2.6 — Reveal (captured visual, not a typed prompt)**
+
+No prompt to enter — during the capture, **open `index.html` and toggle through light → dark → system**,
+and **screen-record / screenshot** it for the showcase. This is a visual beat; the agent has nothing to
+run. Then continue to Step 2.7.
+
+- [ ] **Step 2.7 — Archive the spec (finalize the change)**
+
+> #### ▶ Próximo prompt
+>
+> ```
+> Perfeito. Pode arquivar a change (openspec-archive-change).
+> ```
+
+The agent archives `color-theme` → `openspec/specs/color-theme/spec.md` on the worktree branch. This is
+the last capture prompt; Steps 3–5 below are off-stage agent/hygiene work.
+
+- [ ] **Step 3: (off-stage, agent) Confirm the session history captured every step and its outcome**
 
 The session history is the raw material the demo replays, so verify **both phases** end-to-end with
 each outcome legible: **(a) intake (Task 14.6)** — requirement classified + deduped, routed to
@@ -1861,7 +1978,7 @@ produced, the align pushback citing ADR-0002/0003, the fresh implementation acti
 green gates, the review findings, the reveal, the archived `color-theme` spec. A capture is repeatable
 and off-stage — if any step or outcome reads unclearly, **re-run the affected cycle** rather than patch it.
 
-- [ ] **Step 4: Write the demo narration transcript (the deliverable)**
+- [ ] **Step 4: (off-stage, agent) Write the demo narration transcript (the deliverable)**
 
 Author `docs/superpowers/demo-script.md` — the presenter's spoken script for the live demo, walking the
 session history **step by step, each step paired with its outcome**, across **both phases**. For every
@@ -1946,7 +2063,7 @@ implementation.
 
 This script plus the session history _are_ the demo; the theme feature is not.
 
-- [ ] **Step 5: Merge the completed change so the repo reflects the final end state**
+- [ ] **Step 5: (off-stage, agent) Merge the completed change so the repo reflects the final end state**
 
 The session history is already captured (immutable), so now advance the repo to the truthful end
 state — the honest final outcome of a completed change. Land the worktree branch on `main`:
