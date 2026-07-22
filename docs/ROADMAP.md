@@ -31,6 +31,7 @@ orquestrador**, exceto o worker que dona a própria linha (§2.1/§6).
 | `thirds-ranking` (CLA-02)          | classificacao | T3   | CLA-01                         | E     | 🔲     |
 | `knockout-bracket` (CLA-03)        | classificacao | T3   | CLA-01, CLA-02                 | E     | 🔲     |
 | `establish-ui-shell` (APR-01)      | apresentacao  | T2   | dados, classificacao, ADR-0003 | E     | 🟢     |
+| `theme-preference` (APR-02)        | apresentacao  | T2   | APR-01, ADR-0002, ADR-0003     | I     | 🔲     |
 
 > `persist-score-overrides` e `establish-ui-shell` documentam comportamento **já existente**
 > no app e foram arquivados para (a) bootstrapar `openspec/specs/` e (b) plantar dois
@@ -40,12 +41,12 @@ orquestrador**, exceto o worker que dona a própria linha (§2.1/§6).
 ## Critical path
 
 ```
-ADR-0001..0004 ─► DAT-01 ─► DAT-02 ─► CLA-01 ─► CLA-02 ─► CLA-03 ─► APR-01 ─► [preferência de tema, ao vivo]
+ADR-0001..0004 ─► DAT-01 ─► DAT-02 ─► CLA-01 ─► CLA-02 ─► CLA-03 ─► APR-01 ─► APR-02 (theme-preference)
 ```
 
 ## Milestones
 
 - **M0 — Foundations:** ADR-0001..0004 Accepted; gates verdes.
 - **M1 — App existente documentado:** DAT-02 + APR-01 arquivados (specs emergentes).
-- **M2 — Demo:** o ciclo do workflow executado ao vivo sobre uma nova preferência de tema —
+- **M2 — Demo:** o ciclo do workflow executado ao vivo sobre `theme-preference` (APR-02) —
   do `requirement-intake` (planejamento) ao `archive` (spec emergente).
