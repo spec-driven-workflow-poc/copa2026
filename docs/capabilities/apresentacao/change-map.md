@@ -9,10 +9,10 @@
 
 ## Changes (ordered)
 
-| #      | Change               | FR      | Effort | Risk | Tier | Deps                                 |
-| ------ | -------------------- | ------- | ------ | ---- | ---- | ------------------------------------ |
-| APR-01 | `establish-ui-shell` | FR-APR1 | M      | low  | T2   | dados, classificacao                 |
-| APR-02 | `theme-preference`   | FR-APR2 | M      | high | T2   | APR-01, ADR-0002, ADR-0003           |
+| #      | Change               | FR      | Effort | Risk | Tier | Deps                       |
+| ------ | -------------------- | ------- | ------ | ---- | ---- | -------------------------- |
+| APR-01 | `establish-ui-shell` | FR-APR1 | M      | low  | T2   | dados, classificacao       |
+| APR-02 | `theme-preference`   | FR-APR2 | M      | high | T2   | APR-01, ADR-0002, ADR-0003 |
 
 > **APR-02 risk=high, tier=T2:** toca superfície compartilhada (tokens de cor) +
 > persistência — alto raio de impacto (AGENTS.md), por isso `high`. Não é o núcleo
