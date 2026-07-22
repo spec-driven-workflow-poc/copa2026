@@ -13,6 +13,59 @@
 > `color-theme` novo (regra de reuso do `openspec/config.yaml`). Os dois reforçam
 > a tese central — o agente raciocina a partir dos artefatos, não recita um script.
 
+## Introdução
+
+### Contexto do projeto
+
+**Copa2026** é uma página estática para acompanhar a Copa do Mundo 2026 — tabelas
+dos grupos, mata-mata, próximos jogos, resultados. HTML/CSS/JS puro, **sem build**,
+estado do usuário só em `localStorage`. É deliberadamente pequeno na superfície de
+código, mas roda sobre uma **camada de planejamento inteira**: briefs, change-maps,
+quatro ADRs e um ROADMAP, orquestrados por OpenSpec. É essa camada — não o tamanho
+do código — que o processo exercita.
+
+### Por que este projeto
+
+Escolhemos copa2026 porque ele é **real e pequeno o bastante para caber numa demo**,
+mas tem exatamente o que faz o processo "morder": decisões transversais já
+congeladas em ADRs (como persistir estado, como tratar cor e tema) e um histórico
+de mudanças que essas decisões anteciparam. Um projeto de brinquedo não teria
+invariantes para defender; um projeto grande demais não caberia na tela. Aqui a
+tese central fica visível sem ruído: **o agente raciocina a partir dos artefatos
+canônicos, não recita um script.**
+
+Vale lembrar: **este é o mesmo projeto que já apresentamos a esta plateia** numa
+sessão anterior. Não precisamos reintroduzi-lo do zero — a familiaridade libera a
+atenção para o que de fato importa aqui. E o que importa **não é a complexidade da
+mudança** (o seletor de tema é modesto de propósito): é o que a **restrição do
+workflow e a base de conhecimento** fazem por essa mudança. As ADRs, os briefs, os
+gates e o OpenSpec são o que transforma uma feature pequena numa demonstração de
+como decisões persistem, guiam trabalho futuro e resistem à pressão do operador.
+Guardem essa distinção — todo beat abaixo é sobre o processo, não sobre o tema.
+
+A mudança capturada é a **`theme-preference` (APR-02)** — um seletor de tema
+claro / escuro / seguir-o-sistema, persistido. Ela toca tokens de cor e persistência,
+exatamente as superfícies que as ADRs já governavam.
+
+### O que será mostrado
+
+Três vitrines complementares, todas evidência da **mesma** tese:
+
+1. **A session history (o corpo deste roteiro).** O raciocínio do agente passo a
+   passo — `requirement-intake` nascendo o change, `execute-change` construindo — com
+   os beats onde ele deriva o tier, cita ADRs e recusa uma ordem que violaria uma
+   decisão congelada. É onde se vê o _como_.
+2. **Os PRs reais — #1 e #2.** O planejamento não fica no chat: vira artefato
+   versionado. O **PR #1** é o gate de planejamento (o intake mergeado); o **PR #2**
+   é a execução (o tema implementado, com invariantes conferidos e gates verdes). O
+   checkpoint humano é o review de um PR de verdade, não uma pausa no meio da corrida.
+3. **O `index.html` rodando.** O resultado ao vivo: alternar claro → escuro → sistema,
+   sem flash na recarga, tudo por tokens. A prova de que o invariante (ADR-0003) virou
+   comportamento correto e visível.
+
+Ao longo da narração, os beats abaixo apontam para (1); ao final, revelamos (3) e
+voltamos aos (2) para fechar o ciclo planejamento → execução → resultado.
+
 ## Fase 1 — requirement-intake (nasce o change)
 
 ### 1. Carregar contexto (§1)
