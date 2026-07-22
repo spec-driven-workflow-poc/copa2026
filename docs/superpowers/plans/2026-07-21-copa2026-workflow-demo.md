@@ -1865,7 +1865,73 @@ and off-stage — if any step or outcome reads unclearly, **re-run the affected 
 
 Author `docs/superpowers/demo-script.md` — the presenter's spoken script for the live demo, walking the
 session history **step by step, each step paired with its outcome**, across **both phases**. For every
-step write a **Cue** (which part of the session history to show) + a **Say** (the narration). The steps:
+step write a **Cue** (which part of the session history to show), a **Say** (the narration), and an
+**Amarra** (the presentation concept the beat proves — this formalizes the tie-back below into a
+per-beat field, not a trailing paragraph).
+
+**Required file structure.** The file must follow this skeleton exactly — one `###` beat per enumerated
+step in the two lists below, numbered continuously 1–15, each carrying **Cue** + **Say** + **Amarra**. Do
+not merge beats or collapse a phase into a single pair:
+
+```markdown
+# Demo — Narração (requirement-intake → execute-change)
+
+> Roteiro falado do apresentador sobre a session history capturada. Cada beat =
+> um passo do processo + seu resultado. **Cue** = o que mostrar na tela (qual
+> trecho da session history); **Say** = a fala; **Amarra** = o conceito da
+> apresentação que o beat prova. Ordem = ordem dos beats.
+
+## Fase 1 — requirement-intake (Task 14.6)
+
+### 1. Carregar contexto (§1)
+- **Cue:** <trecho da session history a exibir>
+- **Say:** "<fala do apresentador>"
+- **Amarra:** <conceito da apresentação que este beat prova>
+
+### 2. Classificar + dedup (§2)
+- **Cue:** …
+- **Say:** …
+- **Amarra:** …
+
+<... um bloco ### por beat, na ordem: route (§3) → ADR-scan (§4) →
+follow-up catch → decompose (§5, T1) → write artifacts (§6, pt-BR) ...>
+
+## Fase 2 — execute-change (Task 15)
+
+### 8. Pre-flight
+- **Cue:** …
+- **Say:** …
+- **Amarra:** …
+
+<... um bloco ### por beat, na ordem: mark doing → propose → align
+(pushback ADR-0002/0003) → apply → review → reveal → archive color-theme ...>
+
+## Tempo total estimado (determinístico)
+- **Palavras faladas (Say):** <N> (medido por `wc -w`)
+- **Ritmo assumido:** <R> palavras/min
+- **Tempo de fala:** <N/R> min
+- **Cues (exibição/interação):** <C> beats × <S> s = <C·S/60> min
+- **Total estimado:** <soma> min
+```
+
+**Rules:**
+
+- **One `###` beat per enumerated step** below — 7 intake beats + 8 execute-change beats, numbered
+  continuously 1–15.
+- Every beat carries all three fields: **Cue**, **Say** (spoken line, in quotes), **Amarra**.
+- **Language:** pt-BR (Global Constraint); domain terms verbatim.
+
+**Predict total demo runtime — deterministically, not by guess.** The file MUST end with the "Tempo total
+estimado" section, and every number in it MUST come from a deterministic tool, never an eyeballed estimate:
+
+- Count the spoken words by running `wc -w` over the **Say** lines (e.g. extract them, or
+  `grep -A0 "Say:" demo-script.md | wc -w`) — record the exact count.
+- Divide by a stated speaking rate `R` (default **130 wpm**; state whatever you use) → fala em minutos.
+- Add a fixed per-Cue display/interaction allowance (`C` beats × `S` seconds, default **S = 20 s**) for
+  time spent showing the session history and doing the live reveal/toggle.
+- Show the arithmetic (the skeleton's formula lines) so the total is reproducible, not asserted.
+
+The steps:
 
 - **Intake phase (Task 14.6):** load context → classify + dedup → route to `apresentacao` → ADR-scan
   (finds ADR-0002/0003 Accepted → **no new ADR**) → **follow-up catch via the ADRs** → decompose (**T1**)
