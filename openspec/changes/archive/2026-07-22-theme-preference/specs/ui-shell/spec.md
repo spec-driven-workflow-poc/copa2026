@@ -46,6 +46,13 @@ para tokens. _(ADR-0003)_
 - **WHEN** `styles.css` é carregado
 - **THEN** os tokens de cor base (ex.: `--bg`, `--ink`) estão definidos no `:root`
 
+#### Scenario: Follow-up de extração de hardcodes registrado
+
+- **WHEN** o tema escuro está ativo
+- **THEN** os elementos antes hardcoded (gradiente da topbar, fundo das abas,
+  tooltip, fundos de input) seguem o tema via tokens — não ficam presos no claro
+  (o follow-up de extração está concluído)
+
 #### Scenario: Tema escuro é um override de tokens
 
 - **WHEN** `data-theme="dark"` está no elemento raiz

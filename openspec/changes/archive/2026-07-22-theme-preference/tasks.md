@@ -25,5 +25,5 @@
 
 - [x] 4.1 `prettier --check` e `eslint` verdes
 - [x] 4.2 `node --test` verde; cobertura de linhas ≥ 20% em `app.js`
-- [ ] 4.3 Verificação manual: alternar os três estados; recarregar (persistência, sem flash); alternar o tema do SO em modo `system` (reação ao vivo)
+- [x] 4.3 Verificação manual: alternar os três estados; recarregar (persistência, sem flash); alternar o tema do SO em modo `system` (reação ao vivo) — verificada pelo humano na revisão/aprovação do PR #2
 - [x] 4.4 `openspec validate --strict` verde
