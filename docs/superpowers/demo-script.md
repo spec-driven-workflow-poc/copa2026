@@ -13,6 +13,23 @@
 > `color-theme` novo (regra de reuso do `openspec/config.yaml`). Os dois reforçam
 > a tese central — o agente raciocina a partir dos artefatos, não recita um script.
 
+## Setup do apresentador — janelas do navegador
+
+> Pré-requisito de operação, não de narração. Além do código e da session history do
+> Claude Code, a demo depende de **seis janelas/abas de navegador** preparadas _antes_
+> da apresentação. Deixe todas abertas e ordenadas; durante a demo o apresentador
+> **alterna rapidamente** entre elas nos beats indicados. Nada abaixo se improvisa ao
+> vivo — se uma aba não estiver pronta, o beat correspondente perde a prova.
+
+| # | Janela | O que abrir | Serve ao beat / vitrine |
+| - | ------ | ----------- | ----------------------- |
+| 1 | **`rodrigofigueiredo005/copa2026`** | Repo de referência — a origem de onde o copa2026 do POC foi derivado. | Contexto de "Por que este projeto"; reforça o beat 12 (implementação _sem código de referência_). |
+| 2 | **`spec-driven-workflow-poc/copa2026` — estado pré-`/requirement-intake`** | Este repo num commit/estado **anterior** ao intake: foundation specs presentes (as quatro ADRs, briefs, change-maps, ROADMAP), mas **nenhum change de tema**. | Beat 1 ("a página está limpa") e beat 2 (dedup). |
+| 3 | **`spec-driven-workflow-poc/copa2026` — estado atual** | Este repo **agora**, com PRs #1 e #2 mergeados e o delta arquivado. | Beat 15 (archive); o "depois" que fecha o ciclo. |
+| 4 | **PRs #1 e #2** | PR #1 = gate de planejamento (intake mergeado); PR #2 = execução (tema implementado, gates verdes). | Vitrine 2; beats 7 (gate no PR) e 12 (execução). |
+| 5 | **`copa2026-two-pink.vercel.app`** | A página publicada ao vivo. | Prova de deploy real; apoio ao reveal. |
+| 6 | **`index.html` — estado final pós-`dark-mode`** | O arquivo servido/aberto no navegador, com o seletor de tema funcionando (claro → escuro → sistema, sem flash na recarga). | Beat 14 (Reveal) e vitrine 3. |
+
 ## Introdução
 
 ### Contexto do projeto
