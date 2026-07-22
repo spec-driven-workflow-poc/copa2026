@@ -8,7 +8,7 @@ description: Use when adding/registering requirement(s) to the project — eithe
 ## Overview
 Turns requirement(s) into the **planning layer** of the workflow (see `docs/workflow/README.md`; templates in `docs/workflow/templates/`). The **agent decides** routing and decomposition, recording its reasoning; the **human gate is the PR review** — not mid-run interruptions. Planning, never execution.
 
-**Output language:** write all generated artifacts in **English** (the project's documentation language; see `AGENTS.md`), **regardless of the input language** — keep domain terms verbatim (e.g., `boleto`, `PIX`) and define them in a glossary. The input requirements file may be in another language; consolidate it into English.
+**Output language:** write all generated artifacts in **the project's documentation language as declared in `AGENTS.md`** (for copa2026: **pt-BR**), **regardless of the input language** — keep domain terms verbatim (e.g., `grupo`, `mata-mata`, `pênaltis`) and define them in the glossary. The input may be in another language; consolidate it into the project's documentation language.
 
 **Two modes (detect from the input):**
 - **Single** — input is **one** requirement description → one updated planning pack, one draft PR.

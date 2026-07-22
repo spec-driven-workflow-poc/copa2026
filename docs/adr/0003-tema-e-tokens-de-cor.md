@@ -26,9 +26,9 @@ _(Gatilho do follow-up plantado por `establish-ui-shell`.)_
 ## Consequences
 
 - (+) Um tema novo = um bloco de overrides de token; regras não mudam.
-- (+) `align-phase` do `dark-mode` pode discutir `system` vs. forçar tema por esta ADR.
-- (−) Exige a dívida de extrair os hardcodes (endereçada pelo follow-up + `dark-mode`).
+- (+) A _align-phase_ de um futuro change de tema pode discutir `system` vs. forçar tema por esta ADR.
+- (−) Exige a dívida de extrair os hardcodes (endereçada pelo follow-up + o futuro change de tema).
 
 ## Traceability
 
-FR-APR1 (alternar tema), FR-APR2 (persistir tema — via ADR-0002).
+Requisito de tema futuro (alternar + persistir a preferência — persistência via ADR-0002).

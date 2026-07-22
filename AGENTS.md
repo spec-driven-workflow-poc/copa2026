@@ -63,7 +63,7 @@ Conjunto de gates por workflow §8 (instanciação JS) — rodam via `make check
 - **`eslint`** — análise estática (sem `no-undef`; `no-unused-vars` como warn).
 - **`node --test`** — testes das funções puras (via o seam `module.exports`).
 - **Cobertura ≥ 20% de linhas** em `app.js` (piso honesto do estado atual — 23.20% medido; código novo
-  testável — ex.: `dark-mode` — deve vir bem coberto).
+  testável deve vir bem coberto).
 
 **Local primeiro; CI é backstop.** Verde local **antes** de abrir o PR. Não faça poll de CI.
 

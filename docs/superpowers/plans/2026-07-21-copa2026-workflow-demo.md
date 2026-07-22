@@ -77,6 +77,64 @@ merging it afterward is repo hygiene, not a deliverable; see Decision 1):
 
 ---
 
+## Direction update (2026-07-22b, post-discussion)
+
+> **Canonical** where it conflicts with anything above or below. Added after a second `discussion`
+> session. It **prepends the workflow's true first step** to the demo — `requirement-intake` — so the
+> audience sees the `dark-mode` change **born from a requirement**, not pre-baked.
+
+**What changed.** The demo previously opened at `workflow-execute-change dark-mode`, over a change that
+Tasks 9–10 had **hand-authored** into the planning layer (`FR-APR2`, the `APR-02` change row, the
+`dark-mode` ROADMAP row). That skipped intake — the step that *produces* planning. The demo now opens
+with a live `requirement-intake` run (Task 14.6) that **generates** that planning from a free-text theme
+requirement, then `workflow-execute-change` (Task 15) executes it. Two live workflow phases, one captured
+session history.
+
+**Intake's scope in the demo (settled).** Intake **routes** the requirement to `apresentacao`,
+**decomposes** it into one change (deriving tier/effort/risk itself), runs its **ADR-scan (§4)** and finds
+the cross-cutting decisions **already Accepted** (ADR-0002 persistence, ADR-0003 theme/tokens) → creates
+**no new ADR**, and **catches the two planted follow-ups**. It does **NOT** decide localStorage-vs-cookie
+— that proposal-level call stays for the align phase of Task 15, preserving the headline pushback beat.
+
+**How the follow-up catch works (mechanism, not script).** `requirement-intake §1` reads the docs layer
+(briefs / change-maps / ADRs / ROADMAP / overview), **not** `app.js`/`styles.css` source. The catch is
+therefore **via the ADRs**: ADR-0002 names the `prefs`-helper follow-up ("gatilho do follow-up plantado
+por `persist-score-overrides`") and ADR-0003 names the color-token follow-up ("gatilho… `establish-ui-shell`").
+Intake's ADR-scan reads both and records them as implementation debt in the decomposition. Authentic —
+the ADRs are *meant* to guide.
+
+**Anti-bias invariant (NON-NEGOTIABLE for this demo).** Because intake loads the whole docs planning
+layer as context, that layer **must be a genuine pre-theme snapshot**: it MUST NOT name the theme change,
+its tier, or its expected output **anywhere intake reads**, or the "live" intake degrades to a scripted
+read-back — defeating Decision 2's "the agent genuinely decides." The distinction the demo relies on:
+
+- **Legitimate guidance (KEEP):** the ADRs *anticipating* the theme topic, and the planted code
+  breadcrumbs in `app.js`/`styles.css` — the "frozen decisions guide emergent work" thesis.
+- **Bias (REMOVE):** any note prescribing intake's *output* (tier, "no new ADR", the specific
+  follow-ups). The **answer key** for what intake should produce lives **only in this plan**
+  (`docs/superpowers/`, outside intake's context scope) and in the narration transcript (Task 15 Step 4).
+
+If the theme change (or `FR-APR2`) were left in the change-map, intake's **dedup step (§2) would STOP and
+refuse to run** — so stripping it (Task 12.5) is *required*, not cosmetic.
+
+**Language adaptation (settled).** `requirement-intake` SKILL.md line 11 originally said "write artifacts
+in **English** regardless of input." That conflicts with copa2026's pt-BR Global Constraint + `AGENTS.md`.
+Resolved per `AGENTS.md` Precedence (project > transplanted skill) by **adapting the skill line** to defer
+to `AGENTS.md`'s declared language (pt-BR) — same adaptation pattern Task 2 applied to the skills' gate
+references. The skill is therefore **no longer byte-verbatim** (the gate-ref edits already broke that; the
+portability claim rests on `docs/workflow/README.md` + templates, which remain untouched).
+
+**Supersedes:**
+
+- **Tasks 9–10:** the `FR-APR2` / `APR-02` / `dark-mode`-ROADMAP-row authoring is **removed** — see the
+  superseded notes on those tasks and the executed **Task 12.5**.
+- **Task 15 beat 1** ("pre-flight surfaces both follow-up anchors"): the follow-up catch **moves to
+  intake** (Task 14.6). Task 15's pre-flight now consumes intake's output.
+- **The demo's starting line:** now `requirement-intake` (Task 14.6), then `workflow-execute-change`
+  (Task 15).
+
+---
+
 ## File Structure
 
 **Transplanted verbatim from Paymon (`~/workspace/Paymon`):**
@@ -787,7 +845,14 @@ git commit -m "docs: add AGENTS.md constitution (invariants + JS gates)"
 
 ## Task 9: Author the three capability planning packs (briefs + change-maps)
 
-Use the `docs/workflow/templates/` as structure. Keep them scaled but real. **The `apresentacao` change-map is where `dark-mode` (APR-02) lives and where the follow-up story converges.**
+Use the `docs/workflow/templates/` as structure. Keep them scaled but real.
+
+> **Partially superseded (Direction update 2026-07-22b).** As originally executed, Step 5/Step 6 authored
+> `FR-APR2` + `NFR-APR2` in the `apresentacao` brief and the `APR-02 dark-mode` row + note in its
+> change-map. Those are now **removed** (Task 12.5) so the planning layer is a genuine pre-theme snapshot
+> the live `requirement-intake` (Task 14.6) can populate without tripping its dedup guard. The steps below
+> are the **historical record** of the original authoring — do not re-add the theme rows. The
+> `apresentacao` brief now carries only `FR-APR1`; its change-map only `APR-01`.
 
 **Files:**
 
@@ -1030,9 +1095,17 @@ git commit -m "docs: add planning packs (dados, classificacao, apresentacao)"
 **Interfaces:**
 
 - Consumes: all briefs/change-maps/ADRs.
-- Produces: the dashboard the orchestrator reads live; `dark-mode` (APR-02) appears as `🔲 todo` (reserved for the live run). The two foundational changes show `🟢 done` after Tasks 11-12.
+- Produces: the dashboard the orchestrator reads live. The two foundational changes show `🟢 done` after Tasks 11-12.
 
-- [ ] **Step 1: Write `docs/ROADMAP.md`** (from the template; `dark-mode` reserved as 🔲)
+> **Partially superseded (Direction update 2026-07-22b).** As originally executed, this task added a
+> `dark-mode` (APR-02) `🔲` row, listed `APR-02` in the ADR-0002/ADR-0003 "Blocks" cells, put `APR-02
+> (dark-mode, ao vivo)` on the critical path, and framed M2 around `dark-mode`. Those are now **removed**
+> (Task 12.5): no theme row, ADR Blocks cells read `DAT-02` / `APR-01`, the critical path ends
+> `APR-01 ─► [preferência de tema, ao vivo]`, and M2 describes the full live cycle from
+> `requirement-intake` to `archive`. The Step 1 code block below is the **historical record** of the
+> original ROADMAP — do not re-add the theme row.
+
+- [ ] **Step 1: Write `docs/ROADMAP.md`** (from the template; historical — see the superseded note above)
 
 ```markdown
 # ROADMAP — Copa2026
@@ -1276,6 +1349,80 @@ Run: `npx openspec validate --strict`
 ```bash
 git add styles.css test/theming.test.js openspec
 git commit -m "feat(apresentacao): document establish-ui-shell; archive ui-shell spec; plant color-token follow-up"
+```
+
+---
+
+## Task 12.5: Strip the pre-built theme planning (make the snapshot pre-theme) — DONE
+
+> **Added by Direction update 2026-07-22b; executed in that session.** This task realizes the anti-bias
+> invariant: remove every reference to the theme change from the layer `requirement-intake §1` reads, so
+> the live intake (Task 14.6) has genuine work and won't dedup-STOP. ADRs keep their theme *anticipation*
+> and the code breadcrumbs stay — only the *planned change* and its by-name mentions are removed. All
+> edits are docs-only; `make check` stays green.
+
+**Files:**
+
+- Modify: `docs/capabilities/apresentacao/brief.md`, `docs/capabilities/apresentacao/change-map.md`,
+  `docs/ROADMAP.md`, `docs/adr/0002-persistencia-no-cliente.md`, `docs/adr/0003-tema-e-tokens-de-cor.md`,
+  `README.md`, `AGENTS.md`
+
+**Interfaces:**
+
+- Produces: a pre-theme agent-readable planning layer (no `dark-mode` / `APR-02` / `FR-APR2` anywhere
+  intake reads) that Task 14.6 consumes.
+
+- [x] **Step 1: Strip the theme requirement from the `apresentacao` brief**
+
+  In `docs/capabilities/apresentacao/brief.md`: neutralize the "Why" (shell only, no theme/visual-prefs
+  forecast), remove `FR-APR2`, remove `NFR-APR2`, and drop the theme-specific Non-goal.
+
+- [x] **Step 2: Strip the theme change from the `apresentacao` change-map**
+
+  In `docs/capabilities/apresentacao/change-map.md`: remove the `FR-APR2` coverage row, the `APR-02
+  dark-mode` change row, the entire APR-02 explanatory note, and reduce exec-order/MVP to `APR-01`. Add
+  **no** replacement note (any note would re-bias intake — the explanation lives here in the plan).
+
+- [x] **Step 3: Strip the theme change from the ROADMAP**
+
+  In `docs/ROADMAP.md`: remove the `dark-mode` (APR-02) row; change ADR-0002 Blocks `DAT-02, APR-02` →
+  `DAT-02` and ADR-0003 Blocks `APR-01, APR-02` → `APR-01`; reword the bootstrap note to describe the
+  two follow-ups as awaited by "uma futura preferência de usuário" (no `dark-mode` name); end the
+  critical path `APR-01 ─► [preferência de tema, ao vivo]`; reword M2 to the full live cycle.
+
+- [x] **Step 4: Reword the ADRs — keep anticipation, drop the change name**
+
+  In `docs/adr/0002` and `0003`: reword every by-name `dark-mode` mention to generic future-theme
+  language (e.g. "a _align-phase_ de um futuro change de tema"), and fix the pre-existing traceability
+  bug in `0003` (it cited `FR-APR1 (alternar tema)`; `FR-APR1` is the shell). Keep the ADRs' theme
+  *anticipation* intact — that is the frozen-decision guidance the demo showcases.
+
+- [x] **Step 5: Fix `README.md` + `AGENTS.md`**
+
+  In `README.md`: rewrite live-cycle bullet nº 7 to the intake→execute arc on an isolated worktree and
+  **delete the stale `prebuilt/dark-mode` safety-net line** (that branch was deleted per the first
+  Direction update); update the "🔲" note from "2 de 8 / só dark-mode é novo" to "pré-planeja 7 changes;
+  o tema nasce ao vivo (intake planeja, execute-change escreve e arquiva)". In `AGENTS.md`: genericize
+  the coverage-floor example (drop the `dark-mode` name).
+
+- [x] **Step 6: Adapt the `requirement-intake` skill output language**
+
+  In `.claude/skills/requirement-intake/SKILL.md` line 11: change "write artifacts in **English**
+  regardless of input" to defer to `AGENTS.md`'s declared documentation language (pt-BR for copa2026),
+  mirroring Task 2's gate-ref adaptation. Prevents the live agent from reading a contradictory
+  instruction mid-demo.
+
+- [x] **Step 7: Gates**
+
+  Run: `grep -rn "dark-mode\|APR-02\|FR-APR2" AGENTS.md README.md docs/ROADMAP.md docs/capabilities docs/adr docs/architecture` → expect no output. Then `make check` → green (docs-only; coverage unchanged at 23.45%).
+
+- [ ] **Step 8: Commit**
+
+```bash
+git add docs/capabilities/apresentacao docs/ROADMAP.md docs/adr/0002-persistencia-no-cliente.md \
+        docs/adr/0003-tema-e-tokens-de-cor.md README.md AGENTS.md \
+        .claude/skills/requirement-intake/SKILL.md docs/superpowers/plans
+git commit -m "docs: strip pre-built theme planning; open demo with requirement-intake (Direction update 2026-07-22b)"
 ```
 
 ---
@@ -1570,30 +1717,111 @@ git checkout main
 
 ---
 
-## Task 15: Build the demo — full workflow run of `dark-mode`, captured as session history
+## Task 14.6: Live `requirement-intake` run — generate the theme change (opening demo beat)
 
-**Goal of this task — and of the whole demo: highlight each process step and the outcome of each
-one.** Run the **real** cycle end-to-end from clean `main` using `workflow-execute-change dark-mode`,
-**fresh from scratch** (no reference implementation, no fallback), so every workflow step and its
-concrete outcome is captured. The two things that matter as **demo deliverables** are the **session
-history** (the on-screen record of the run) and the **demo narration transcript** (Step 4) — _not_
-the feature itself. `main` starts at the clean pre-change state so the run is authentic; **after** the
-history is captured and the transcript written, the completed change is **merged to `main`** (Step 5)
-so the repo reflects its true final end state.
+> **Added by Direction update 2026-07-22b.** This is the demo's **first live beat**: `requirement-intake`
+> turns a free-text theme requirement into the planning layer — the step Tasks 9–10 used to shortcut.
+> **Planning only** (per the skill's Boundaries): it must NOT run `openspec-*`, write code, or touch
+> `openspec/`. Its session history is part of the demo capture; Task 15 (execution) consumes its output.
 
-**Files:** the run creates a fresh `dark-mode` implementation (`app.js`, `styles.css`, `index.html`,
-`test/theme.test.js`) on a worktree branch, later merged to `main` (Step 5), along with `docs/ROADMAP.md`
-(APR-02 → `🟢`) and the archived `openspec/specs/color-theme/` spec. The task's own authored file is
-`docs/superpowers/demo-script.md` (Step 4).
+**Prerequisite:** Task 12.5 committed — the agent-readable planning layer is a pre-theme snapshot.
+
+**Files (produced by the run, in pt-BR per the adapted skill):**
+
+- Modify: `docs/capabilities/apresentacao/brief.md` (intake adds the theme `FR`), `docs/capabilities/apresentacao/change-map.md` (intake adds the theme change row + FR-coverage row), `docs/ROADMAP.md` (intake adds the rollup row, `🔲`)
+- No new ADR (the ADR-scan finds ADR-0002/0003 already `Accepted`).
 
 **Interfaces:**
 
-- Consumes: everything above. `main` must have `dark-mode` (APR-02) as `🔲` in the ROADMAP and no
-  dark-mode code **at the start of the run**.
-- Produces: **two demo artifacts** — (1) the **session history** of the run (shown on screen), and
-  (2) the **demo narration transcript** `docs/superpowers/demo-script.md` (the authored deliverable).
-  Plus the repo's advance to its final end state (dark-mode merged to `main`, `color-theme` archived,
-  APR-02 → `🟢`) — repo hygiene, not a demo deliverable.
+- Consumes: the pre-theme docs layer (Task 12.5); ADR-0002 + ADR-0003 (which name the two follow-ups).
+- Produces: the theme change's planning — the exact rows Task 15's pre-flight reads. **Expected shape
+  (answer key — do NOT pre-write into the repo):** FR for theme toggle+persist in `apresentacao`; one
+  change (kebab-case, `apresentacao`, effort S, risk low, **T1**, deps `APR-01, ADR-0002, ADR-0003`);
+  **no new ADR**; both planted follow-ups recorded as implementation debt.
+
+- [ ] **Step 1: Confirm the pre-theme snapshot**
+
+Run:
+
+```bash
+git checkout main
+grep -rn "dark-mode\|APR-02\|FR-APR2" docs/capabilities docs/ROADMAP.md docs/adr docs/architecture   # expect no output
+```
+
+Expected: no output — nothing names the theme change in the layer intake reads. (If a row exists, intake
+§2 would dedup-STOP; fix before running.)
+
+- [ ] **Step 2: Invoke `requirement-intake` (single mode) with the free-text requirement**
+
+Invoke the `requirement-intake` skill with a requirement such as:
+
+> "Quero um seletor de tema na página: alternar entre claro, escuro e seguir o sistema, e que a página
+> lembre a escolha entre visitas."
+
+Let the skill drive. The beats to expect (each is a narration point in Task 15 Step 4):
+
+1. **Load context (§1):** reads the briefs/change-maps/ADRs/ROADMAP; no theme change exists yet.
+2. **Classify + dedup (§2):** restates the requirement; confirms it is **not** a duplicate → proceeds.
+3. **Routing (§3):** routes to `apresentacao` by bounded-context cohesion (visual shell + user prefs),
+   records the reasoning.
+4. **Risk + ADR-scan (§4):** risk `low`; scans ADRs and finds the cross-cutting decisions **already
+   Accepted** — ADR-0002 (persistence) and ADR-0003 (theme/tokens) → **creates no new ADR**. This is the
+   "frozen decisions persist" beat: the decision was made before the requirement arrived.
+5. **Follow-up catch (via the ADRs):** reading ADR-0002 surfaces the `prefs`-helper follow-up; reading
+   ADR-0003 surfaces the color-token-extraction follow-up. Intake records **both** as implementation
+   debt the change will action.
+6. **Decompose (§5):** one change, effort S, **T1**, deps `APR-01, ADR-0002, ADR-0003`. Narration: the
+   tier is *derived here by intake*, then obeyed by execution — the agent doesn't pick ceremony ad hoc.
+7. **Write artifacts (§6):** adds the FR to the brief, the change row + FR-coverage row to the change-map,
+   the rollup row (`🔲`) to the ROADMAP — **in pt-BR** (adapted skill line).
+8. **Human gate = PR (§7):** intake's model is "the human gate is the PR review, not mid-run
+   interruption." For the demo, opening the draft `plan/<slug>` PR is optional — narrate the concept
+   even if you keep the artifacts on the working tree / worktree branch that Task 15 continues on.
+
+- [ ] **Step 3: Confirm intake produced the expected planning (against the answer key above)**
+
+Verify the change-map now has a single theme change row at **T1** with deps `APR-01, ADR-0002, ADR-0003`,
+the brief has the theme FR, the ROADMAP has the `🔲` rollup row, **no** new `docs/adr/NNNN-*.md` was
+created, and both follow-ups are named in the intake reasoning. If intake chose a materially different
+shape (e.g. proposed a new ADR, or missed a follow-up), that is **demo-legible** — capture it and decide
+whether to re-run (the capture is off-stage and repeatable) or narrate the divergence honestly.
+
+- [ ] **Step 4: Do NOT proceed to execution here**
+
+Intake is planning only. Execution (`openspec-propose` → align → apply → review → archive) is **Task 15**.
+The theme change is now a real, reserved `🔲` row — created live, exactly as `dark-mode` used to be
+pre-baked.
+
+---
+
+## Task 15: Build the demo — full workflow run of the theme change, captured as session history
+
+**Goal of this task — and of the whole demo: highlight each process step and the outcome of each
+one.** This is the **execution** half of the demo; the **planning** half is Task 14.6 (`requirement-intake`),
+which runs first and creates the theme change. Run the **real** cycle end-to-end using
+`workflow-execute-change <theme-change>` (the change `requirement-intake` minted in Task 14.6 —
+**expected `dark-mode`**; use whatever name intake actually produced), **fresh from scratch** (no reference
+implementation, no fallback), so every workflow step and its concrete outcome is captured. The two things
+that matter as **demo deliverables** are the **session history** (the on-screen record of both the intake
+and execute-change runs) and the **demo narration transcript** (Step 4) — _not_ the feature itself.
+`main` starts with the theme change reserved `🔲` (from Task 14.6) and **no theme code**, so the run is
+authentic; **after** the history is captured and the transcript written, the completed change is **merged
+to `main`** (Step 5) so the repo reflects its true final end state.
+
+**Files:** the run creates a fresh theme implementation (`app.js`, `styles.css`, `index.html`,
+`test/theme.test.js`) on a worktree branch, later merged to `main` (Step 5), along with `docs/ROADMAP.md`
+(the theme row → `🟢`) and the archived `openspec/specs/color-theme/` spec (expected spec-id). The task's
+own authored file is `docs/superpowers/demo-script.md` (Step 4).
+
+**Interfaces:**
+
+- Consumes: everything above, **including Task 14.6's output** — `main` must have the theme change as
+  `🔲` in the ROADMAP (created by intake, expected `dark-mode`/APR-02) and **no theme code** at the start
+  of the run.
+- Produces: **two demo artifacts** — (1) the **session history** of the runs (intake + execute-change,
+  shown on screen), and (2) the **demo narration transcript** `docs/superpowers/demo-script.md` (the
+  authored deliverable). Plus the repo's advance to its final end state (theme change merged to `main`,
+  `color-theme` archived, its ROADMAP row → `🟢`) — repo hygiene, not a demo deliverable.
 
 - [ ] **Step 1: Confirm the clean starting state**
 
@@ -1601,21 +1829,22 @@ Run:
 
 ```bash
 git checkout main
-grep -n "dark-mode" docs/ROADMAP.md          # APR-02 row present, Status 🔲
-grep -c "data-theme" app.js styles.css index.html   # expect 0 in all three
+grep -n "tema\|theme" docs/ROADMAP.md         # the theme row intake created (Task 14.6), Status 🔲
+grep -c "data-theme" app.js styles.css index.html   # expect 0 in all three (no theme CODE yet)
 make check                                    # green
 ```
 
-Expected: `dark-mode` reserved as todo; zero dark-mode code on main; gates green.
+Expected: the theme change reserved as `🔲` (created by intake, Task 14.6); zero theme code on main; gates green.
 
 - [ ] **Step 2: Run the live cycle via `workflow-execute-change` (fresh)**
 
-Invoke `workflow-execute-change dark-mode`. Let the skill drive — the session history it generates
-is the demo. The beats to expect:
+Invoke `workflow-execute-change <theme-change>` (the name intake minted; expected `dark-mode`). Let the
+skill drive — the session history it generates, **together with the intake session history from Task
+14.6**, is the demo. The beats to expect:
 
-1. Pre-flight: matches APR-02 row; deps `APR-01 🟢`, `ADR-0002/0003 Accepted`; surfaces **both follow-up anchors** (app.js prefs, styles.css tokens).
+1. Pre-flight: matches the theme change row intake created; deps `APR-01 🟢`, `ADR-0002/0003 Accepted`; **the two follow-ups are already recorded in intake's decomposition** (Task 14.6 caught them via the ADRs) — pre-flight confirms them and execution will *action* them (introduce the `prefs` helper; tokenize the hardcoded colors).
 2. Mark `doing` (🔲→🟡) on the worktree branch — single ROADMAP cell (never lands on `main`).
-3. Worktree + `openspec-propose dark-mode` (**T1 spec-lite — no `design.md`**; spec-id `color-theme`). Narration: tier is read from the change-map (APR-02 = T1), "the agent doesn't choose the ceremony."
+3. Worktree + `openspec-propose <theme-change>` (**T1 spec-lite — no `design.md`**; spec-id `color-theme`). Narration: the tier was **derived by intake** (Task 14.6) and is now **read from the change-map** and obeyed — "the agent doesn't choose the ceremony, planning fixed it."
 4. **Align — human-driven disagreement:** the presenter proposes cookie / "toggle forces theme, ignore OS". The agent must push back citing **ADR-0002** (localStorage, not cookie) and **ADR-0003** (`system` is a first-class value). Land on localStorage + `light|dark|system`.
 5. `openspec-apply-change` — **implement fresh (TDD), guided only by the ADRs + planted breadcrumbs**, not by any reference branch. Fill the apply wait with the archived `establish-ui-shell` `design.md` (`openspec/changes/archive/establish-ui-shell/design.md`) — demonstrates a `design.md` from a **T2** change without `dark-mode` (T1) needing one, exactly as the presentation's Tier Note prescribes.
 6. `make check` green; `workflow-code-review` (Layer A).
@@ -1624,25 +1853,32 @@ is the demo. The beats to expect:
 
 - [ ] **Step 3: Confirm the session history captured every step and its outcome**
 
-The session history is the raw material the demo replays, so verify it end-to-end: every §8 step
-present **with its outcome legible** — the proposal produced, the align pushback citing
-ADR-0002/0003, the fresh implementation + green gates, the review findings, the reveal, the archived
-`color-theme` spec. A capture is repeatable and off-stage — if any step or outcome reads unclearly,
-**re-run the cycle** rather than patch it.
+The session history is the raw material the demo replays, so verify **both phases** end-to-end with
+each outcome legible: **(a) intake (Task 14.6)** — requirement classified + deduped, routed to
+`apresentacao`, ADR-scan finding ADR-0002/0003 already Accepted (no new ADR), both follow-ups caught,
+decomposed to a T1 change, artifacts written in pt-BR; **(b) execute-change (this task)** — the proposal
+produced, the align pushback citing ADR-0002/0003, the fresh implementation actioning both follow-ups +
+green gates, the review findings, the reveal, the archived `color-theme` spec. A capture is repeatable
+and off-stage — if any step or outcome reads unclearly, **re-run the affected cycle** rather than patch it.
 
 - [ ] **Step 4: Write the demo narration transcript (the deliverable)**
 
-Author `docs/superpowers/demo-script.md` — the presenter's spoken script for the live demo, walking
-the session history **step by step, each step paired with its outcome**. For every §8 step (pre-flight
-→ mark doing → propose → align → apply → review → reveal → archive) write:
+Author `docs/superpowers/demo-script.md` — the presenter's spoken script for the live demo, walking the
+session history **step by step, each step paired with its outcome**, across **both phases**. For every
+step write a **Cue** (which part of the session history to show) + a **Say** (the narration). The steps:
 
-- **Cue** — which part of the session history to show on screen.
-- **Say** — the narration: what the step _is_, why the workflow does it, and **the concrete outcome**
-  visible in the history — tying each back to the presentation's concepts (frozen decisions/ADRs,
-  tier-read-from-change-map, the align pushback on ADR-0002/0003, spec-lite vs. `design.md`, gates as
-  a floor not a proof).
+- **Intake phase (Task 14.6):** load context → classify + dedup → route to `apresentacao` → ADR-scan
+  (finds ADR-0002/0003 Accepted → **no new ADR**) → **follow-up catch via the ADRs** → decompose (**T1**)
+  → write artifacts (pt-BR). This is the "requirement is *born* into the planning" opening.
+- **Execute-change phase (this task):** pre-flight → mark doing → propose → **align (cookie pushback on
+  ADR-0002/0003)** → apply → review → reveal → archive.
 
-This script plus the session history _are_ the demo; the `dark-mode` feature is not.
+Tie each back to the presentation's concepts: frozen decisions/ADRs persisting *before* the requirement
+arrived, tier derived-by-intake-then-obeyed, the align pushback on ADR-0002/0003, spec-lite vs.
+`design.md`, gates as a floor not a proof, and the planted follow-ups caught at planning and actioned at
+implementation.
+
+This script plus the session history _are_ the demo; the theme feature is not.
 
 - [ ] **Step 5: Merge the completed change so the repo reflects the final end state**
 
@@ -1651,39 +1887,41 @@ state — the honest final outcome of a completed change. Land the worktree bran
 
 ```bash
 git checkout main
-git merge --no-ff <dark-mode-worktree-branch>   # fresh implementation + archived color-theme spec
+git merge --no-ff <theme-worktree-branch>        # fresh implementation + archived color-theme spec
 git add docs/superpowers/demo-script.md          # the narration transcript deliverable
-git commit -m "docs: dark-mode demo narration transcript"
+git commit -m "docs: theme demo narration transcript"
 make check                                       # green on main
 git worktree remove <path>                        # tidy up the worktree
 ```
 
-Expected: `main` now carries the `dark-mode` implementation, `openspec/specs/color-theme/spec.md`
-archived, `docs/ROADMAP.md` APR-02 flipped `🔲 → 🟢`, and the narration transcript. The repo reads as
-a finished, coherent end state; git history still preserves the pre-change commit for anyone who wants
-to re-run the demo.
+Expected: `main` now carries the theme implementation, `openspec/specs/color-theme/spec.md` archived,
+the theme change's `docs/ROADMAP.md` row flipped `🔲 → 🟢`, and the narration transcript. The repo reads
+as a finished, coherent end state; git history still preserves the pre-change commit (and the intake +
+execute-change commits) for anyone who wants to re-run the demo.
 
 ---
 
 ## Self-Review
 
-> Reconciled with the 2026-07-22 Direction update: the demo's goal is to **highlight each process
-> step and its outcome**; the deliverables are the **session history** + the **demo narration
-> transcript**, never the `dark-mode` feature.
+> Reconciled with the 2026-07-22 **and 2026-07-22b** Direction updates: the demo's goal is to **highlight
+> each process step and its outcome**, **starting from `requirement-intake`**; the deliverables are the
+> **session history** (intake + execute-change) + the **demo narration transcript**, never the theme feature.
 
 **1. Spec coverage (against the artifact's Live-Demo §8 + Prep checklist):**
 
 - "build app-demo using own workflow; bootstrap with AGENTS.md, planning pack, mini-ROADMAP, gates" → Tasks 4-12. ✅
-- "keep `dark-mode` reserved" → ROADMAP row 🔲 (Task 10) at the start of the run; merged to 🟢 (Task 15 Step 5) afterward so the repo reflects the end state. ✅
-- Demo steps 1-9 (system context, tier from change-map, worktree, propose, **align with intentional disagreement**, apply, gates+review, reveal, archive) → captured live in Task 15, each step paired with its outcome in the narration transcript (Task 15 Step 5). ✅
-- "use the session history as the demo reference" → Task 15 Steps 2-3 (session history) + Step 5 (spoken script over it). ✅
-- Headline goal — **frozen decisions persist across ADRs, briefs, follow-ups** — shown live via the align pushback (ADR-0002/0003) over the chain ADR-0002/0003 → FR-APR2 → two planted follow-ups → `dark-mode` → archived `color-theme` spec. ✅
+- **"start from the first workflow step (requirement-intake)"** → Task 14.6 runs it live, generating the theme change from a free-text requirement; Task 12.5 stripped the pre-built planning so the run is genuine (and won't dedup-STOP). ✅
+- "keep the demo change reserved" → the theme change is a `🔲` row **created live by intake** (Task 14.6), not hand-authored; merged to 🟢 (Task 15 Step 5) afterward so the repo reflects the end state. ✅
+- Demo steps (intake: context→classify→route→ADR-scan→**follow-up catch**→decompose→write; then execute-change: system context, tier obeyed-from-change-map, worktree, propose, **align with intentional disagreement**, apply, gates+review, reveal, archive) → captured live in Tasks 14.6 + 15, each step paired with its outcome in the narration transcript (Task 15 Step 4). ✅
+- "use the session history as the demo reference" → Tasks 14.6 + 15 Steps 2-3 (session history) + Step 4 (spoken script over it). ✅
+- Headline goal — **frozen decisions persist across ADRs, briefs, follow-ups** — shown live: intake's ADR-scan finds ADR-0002/0003 already Accepted (no new ADR) and catches the two follow-ups, then the align pushback (ADR-0002/0003) reinforces it — the chain ADR-0002/0003 (frozen *before* the requirement) → intake-generated FR + change → two planted follow-ups → theme implementation → archived `color-theme` spec. ✅
+- **Anti-bias invariant** — the agent-readable planning layer is a pre-theme snapshot (Task 12.5); the "expected intake output" lives only in the plan + narration, never where intake reads. ✅
 
-**2. Superseded scope (kept as historical record, not executed):** Task 13 (prebuilt reference branch — deleted, local + remote) and Task 14 (plausible-B — optional, never created). Layer B in-PR bot stays out of scope (no live CI bot wired) — a known limitation to state if asked.
+**2. Superseded scope (kept as historical record, not executed):** Tasks 9–10 (the theme planning they authored, removed by Task 12.5), Task 13 (prebuilt reference branch — deleted, local + remote), Task 14 (plausible-B — optional, never created). Layer B in-PR bot stays out of scope (no live CI bot wired) — a known limitation to state if asked.
 
-**3. Placeholder scan:** the ADRs, AGENTS.md, the follow-up notes, and the planning packs are concrete. The one artifact authored during the live run itself — `docs/superpowers/demo-script.md` (Task 15 Step 4) — is produced from the actual session history, not pre-written here. No "TBD"/"add appropriate X" remain.
+**3. Placeholder scan:** the ADRs, AGENTS.md, the follow-up notes, and the (pre-theme) planning packs are concrete. Two artifacts are authored during the live runs, not pre-written here: the theme planning (Task 14.6, by intake) and `docs/superpowers/demo-script.md` (Task 15 Step 4, from the session history). Deliberate `<theme-change>` placeholders mark where the change name is minted live by intake (expected `dark-mode`). No "TBD"/"add appropriate X" remain.
 
-**4. Type/name consistency:** Fixed IDs used consistently — capabilities `dados`/`classificacao`/`apresentacao`; changes `DAT-01..03`/`CLA-01..03`/`APR-01..02`; spec-ids `state-persistence`/`ui-shell`/`color-theme`; storage keys `wc2026_*_v1`; `make check` referenced identically across Tasks 4, 8, 11-15.
+**4. Type/name consistency:** Fixed IDs used consistently — capabilities `dados`/`classificacao`/`apresentacao`; changes `DAT-01..03`/`CLA-01..03`/`APR-01` (the theme change `APR-02`/`dark-mode` is **minted live by intake**, expected but not pre-fixed); spec-ids `state-persistence`/`ui-shell`/`color-theme` (last expected from the live run); storage keys `wc2026_*_v1`; `make check` referenced identically across Tasks 4, 8, 11-15.
 
 **Known limitations (call out before the talk):**
 

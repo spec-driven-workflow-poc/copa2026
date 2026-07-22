@@ -30,9 +30,10 @@ espalhar chaves soltas. _(Este é o gatilho do follow-up plantado por `persist-s
 ## Consequences
 
 - (+) Um único eixo de persistência; fácil de auditar e versionar (migração por bump de sufixo).
-- (+) Torna a _align-phase_ do `dark-mode` decidível por referência a esta ADR (cookie é rejeitado aqui).
+- (+) Torna decidível por referência a esta ADR a persistência de qualquer preferência de
+  usuário futura (ex.: tema): cookie é rejeitado aqui.
 - (−) Estado preso ao navegador/dispositivo (aceitável — é acompanhamento pessoal).
 
 ## Traceability
 
-FR-DAT2 (overrides persistentes), FR-APR2 (preferência de tema persistente).
+FR-DAT2 (overrides persistentes); e qualquer preferência de usuário futura persistida (ex.: tema).
