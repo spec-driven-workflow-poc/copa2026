@@ -31,7 +31,7 @@ orquestrador**, exceto o worker que dona a própria linha (§2.1/§6).
 | `thirds-ranking` (CLA-02)          | classificacao | T3   | CLA-01                         | E     | 🔲     |
 | `knockout-bracket` (CLA-03)        | classificacao | T3   | CLA-01, CLA-02                 | E     | 🔲     |
 | `establish-ui-shell` (APR-01)      | apresentacao  | T2   | dados, classificacao, ADR-0003 | E     | 🟢     |
-| `theme-preference` (APR-02)        | apresentacao  | T2   | APR-01, ADR-0002, ADR-0003     | I     | 🔲     |
+| `theme-preference` (APR-02)        | apresentacao  | T2   | APR-01, ADR-0002, ADR-0003     | I     | 🟡     |
 
 > `persist-score-overrides` e `establish-ui-shell` documentam comportamento **já existente**
 > no app e foram arquivados para (a) bootstrapar `openspec/specs/` e (b) plantar dois
